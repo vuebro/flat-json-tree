@@ -15,7 +15,7 @@ export default (
     parent: keyParent = "parent",
     prev: keyPrev = "prev",
     siblings: keySiblings = "siblings",
-  },
+  } = {},
 ) => {
   const data = (isReactive(tree) ? tree : reactive(tree)) as Reactive<
     Record<string, unknown>[]
