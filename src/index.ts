@@ -6,59 +6,50 @@ import { computed, isReactive, nextTick, reactive, watch } from "vue";
 const configurable = true;
 export default (
   tree: Record<string, unknown>[],
-  options: Record<string, string> = {},
+  {
+    branch: keyBranch = "branch",
+    children: keyChildren = "children",
+    id: keyId = "id",
+    index: keyIndex = "index",
+    next: keyNext = "next",
+    parent: keyParent = "parent",
+    prev: keyPrev = "prev",
+    siblings: keySiblings = "siblings",
+  },
 ) => {
   const data = (isReactive(tree) ? tree : reactive(tree)) as Reactive<
     Record<string, unknown>[]
   >;
-  const {
-    branch: keyBranch,
-    children: keyChildren,
-    id: keyId,
-    index: keyIndex,
-    next: keyNext,
-    parent: keyParent,
-    prev: keyPrev,
-    siblings: keySiblings,
-  } = {
-    branch: "branch",
-    children: "children",
-    id: "id",
-    index: "index",
-    next: "next",
-    parent: "parent",
-    prev: "prev",
-    siblings: "siblings",
-    ...options,
-  };
   {
-    const index = {
-      get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[]).findIndex(
-          ({ id }) => this[keyId] === id,
-        );
+    const properties = {
+      [keyBranch]: {
+        get(this: Record<string, unknown>) {
+          const ret = [this];
+          while (ret[0][keyParent])
+            ret.unshift(ret[0][keyParent] as Record<string, unknown>);
+          return ret;
+        },
       },
-    };
-    const prev = {
-      get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[])[
-          (this[keyIndex] as number) - 1
-        ];
+      [keyIndex]: {
+        get(this: Record<string, unknown>) {
+          return (this[keySiblings] as Record<string, unknown>[]).findIndex(
+            ({ id }) => this[keyId] === id,
+          );
+        },
       },
-    };
-    const next = {
-      get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[])[
-          (this[keyIndex] as number) + 1
-        ];
+      [keyNext]: {
+        get(this: Record<string, unknown>) {
+          return (this[keySiblings] as Record<string, unknown>[])[
+            (this[keyIndex] as number) + 1
+          ];
+        },
       },
-    };
-    const branch = {
-      get(this: Record<string, unknown>) {
-        const ret = [this];
-        while (ret[0][keyParent])
-          ret.unshift(ret[0][keyParent] as Record<string, unknown>);
-        return ret;
+      [keyPrev]: {
+        get(this: Record<string, unknown>) {
+          return (this[keySiblings] as Record<string, unknown>[])[
+            (this[keyIndex] as number) - 1
+          ];
+        },
       },
     };
     const defineProperties = (
@@ -68,12 +59,11 @@ export default (
       },
     ) => {
       siblings.value.forEach((value) => {
-        Reflect.defineProperty(value, keyBranch, branch);
-        Reflect.defineProperty(value, keyIndex, index);
-        Reflect.defineProperty(value, keyNext, next);
-        Reflect.defineProperty(value, keyParent, parent);
-        Reflect.defineProperty(value, keyPrev, prev);
-        Reflect.defineProperty(value, keySiblings, siblings);
+        Object.defineProperties(value, {
+          ...properties,
+          [keyParent]: parent,
+          [keySiblings]: siblings,
+        });
         defineProperties(
           {
             configurable,
