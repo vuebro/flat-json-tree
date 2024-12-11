@@ -3,8 +3,8 @@
   "version": "0.3.2",
   "type": "module",
   "scripts": {
-    "lint": "eslint --ext .js,.ts,.vue ./",
-    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "lint": "bunx --bun eslint --ext .js,.ts,.vue ./",
+    "format": "bunx --bun prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "build": "bun --bun run build.ts"
   },
   "dependencies": {
