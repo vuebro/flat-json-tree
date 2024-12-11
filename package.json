@@ -5,13 +5,15 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "build": "bun --bun build ./index.ts --outdir ./ --external vue --minify"
+    "build": "bun --bun run build.ts"
   },
   "dependencies": {
+    "bun-plugin-dts": "^0.3.0",
     "vue": "^3.5.13",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
+    "@types/bun": "^1.1.14",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.1",
