@@ -4,6 +4,7 @@ src/
 .eslintignore
 .eslintrc.json
 .prettierrc.json
+build.ts
 bun.lockb
 index.ts
 tsconfig.json
