@@ -1,0 +1,8 @@
+.github/
+.vscode/
+src/
+.eslintignore
+.prettierrc.json
+bun.lockb
+index.ts
+tsconfig.json
