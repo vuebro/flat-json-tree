@@ -1,7 +1,7 @@
 import type { Reactive } from "vue";
 
 import { v4 } from "uuid";
-import { computed, isReactive, nextTick, reactive, watch } from "vue";
+import { computed, isReactive, nextTick, reactive } from "vue";
 
 const configurable = true;
 export default (
@@ -17,74 +17,62 @@ export default (
     siblings: keySiblings = "siblings",
   } = {},
 ) => {
-  const data = (isReactive(tree) ? tree : reactive(tree)) as Reactive<
-    Record<string, unknown>[]
-  >;
-  {
-    const properties = {
-      [keyBranch]: {
-        get(this: Record<string, unknown>) {
-          const ret = [this];
-          while (ret[0][keyParent])
-            ret.unshift(ret[0][keyParent] as Record<string, unknown>);
-          return ret;
-        },
+  const properties = {
+    [keyBranch]: {
+      get(this: Record<string, unknown>) {
+        const ret = [this];
+        while (ret[0][keyParent])
+          ret.unshift(ret[0][keyParent] as Record<string, unknown>);
+        return ret;
       },
-      [keyIndex]: {
-        get(this: Record<string, unknown>) {
-          return (this[keySiblings] as Record<string, unknown>[]).findIndex(
-            ({ id }) => this[keyId] === id,
-          );
-        },
+    },
+    [keyIndex]: {
+      get(this: Record<string, unknown>) {
+        return (this[keySiblings] as Record<string, unknown>[]).findIndex(
+          ({ id }) => this[keyId] === id,
+        );
       },
-      [keyNext]: {
-        get(this: Record<string, unknown>) {
-          return (this[keySiblings] as Record<string, unknown>[])[
-            (this[keyIndex] as number) + 1
-          ];
-        },
+    },
+    [keyNext]: {
+      get(this: Record<string, unknown>) {
+        return (this[keySiblings] as Record<string, unknown>[])[
+          (this[keyIndex] as number) + 1
+        ];
       },
-      [keyPrev]: {
-        get(this: Record<string, unknown>) {
-          return (this[keySiblings] as Record<string, unknown>[])[
-            (this[keyIndex] as number) - 1
-          ];
-        },
+    },
+    [keyPrev]: {
+      get(this: Record<string, unknown>) {
+        return (this[keySiblings] as Record<string, unknown>[])[
+          (this[keyIndex] as number) - 1
+        ];
       },
-    };
-    const defineProperties = (
-      siblings: { configurable?: boolean; value: Record<string, unknown>[] },
-      parent: { configurable?: boolean; value?: Record<string, unknown> } = {
-        value: undefined,
-      },
-    ) => {
-      siblings.value.forEach((value) => {
-        Object.defineProperties(value, {
-          ...properties,
-          [keyParent]: parent,
-          [keySiblings]: siblings,
-        });
-        defineProperties(
+    },
+  };
+  const getLeaves: (
+    siblings: { configurable?: boolean; value: Record<string, unknown>[] },
+    parent?: { configurable?: boolean; value?: Record<string, unknown> },
+  ) => Record<string, unknown>[] = (siblings, parent = { value: undefined }) =>
+    siblings.value.flatMap((value) => {
+      Object.defineProperties(value, {
+        ...properties,
+        [keyParent]: parent,
+        [keySiblings]: siblings,
+      });
+      return [
+        value,
+        ...getLeaves(
           {
             configurable,
             value: (value[keyChildren] ?? []) as Record<string, unknown>[],
           },
           { configurable, value },
-        );
-      });
-    };
-    watch(data, (value) => {
-      defineProperties({ value });
+        ),
+      ];
     });
-  }
-  const getLeaves = (
-    leaves: Record<string, unknown>[],
-  ): Record<string, unknown>[] =>
-    leaves.flatMap((element) => [
-      element,
-      ...getLeaves((element[keyChildren] ?? []) as Record<string, unknown>[]),
-    ]);
-  const leaves = computed(() => getLeaves(data));
+  const value = (isReactive(tree) ? tree : reactive(tree)) as Reactive<
+    Record<string, unknown>[]
+  >;
+  const leaves = computed(() => getLeaves({ value }));
   const up = (pId: string | undefined) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
