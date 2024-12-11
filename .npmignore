@@ -2,6 +2,7 @@
 .vscode/
 src/
 .eslintignore
+.eslintrc.json
 .prettierrc.json
 bun.lockb
 index.ts
