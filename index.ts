@@ -5,7 +5,7 @@ import { computed, isReactive, nextTick, reactive } from "vue";
 
 const configurable = true;
 export default (
-  tree: Record<string, unknown>[],
+  tree: Reactive<Record<string, unknown>[]> | Record<string, unknown>[],
   {
     branch: keyBranch = "branch",
     children: keyChildren = "children",
