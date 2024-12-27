@@ -1,7 +1,7 @@
 import type { Reactive } from "vue";
 
 import { v4 } from "uuid";
-import { computed, isReactive, nextTick, reactive } from "vue";
+import { computed, isReactive, reactive } from "vue";
 
 const configurable = true;
 export default (
@@ -160,7 +160,7 @@ export default (
     }
     return undefined;
   };
-  const remove = async (pId: string | undefined) => {
+  const remove = (pId: string | undefined) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const next = the[keyNext] as Record<string, unknown> | undefined;
@@ -182,10 +182,7 @@ export default (
           the[keyIndex] as number,
           1,
         );
-        if (!id) {
-          await nextTick();
-          [{ id }] = leaves.value as [{ id: string }];
-        }
+        if (!id) [{ id }] = leaves.value as [{ id: string }];
         return id;
       }
     }
