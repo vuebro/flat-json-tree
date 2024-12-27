@@ -73,7 +73,7 @@ export default (
     Record<string, unknown>[]
   >;
   const leaves = computed(() => getLeaves({ value }));
-  const up = (pId: string | undefined) => {
+  const up = (pId: string) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const index = the[keyIndex] as number;
@@ -85,7 +85,7 @@ export default (
         ];
     }
   };
-  const down = (pId: string | undefined) => {
+  const down = (pId: string) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const index = the[keyIndex] as number;
@@ -97,7 +97,7 @@ export default (
         ];
     }
   };
-  const right = (pId: string | undefined) => {
+  const right = (pId: string) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const prev = the[keyPrev] as Record<string, unknown> | undefined;
@@ -116,7 +116,7 @@ export default (
     }
     return undefined;
   };
-  const left = (pId: string | undefined) => {
+  const left = (pId: string) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const parent = the[keyParent] as Record<string, unknown> | undefined;
@@ -136,7 +136,7 @@ export default (
     }
     return undefined;
   };
-  const add = (pId: string | undefined) => {
+  const add = (pId: string) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const children = the[keyChildren] as
@@ -160,7 +160,7 @@ export default (
     }
     return undefined;
   };
-  const remove = (pId: string | undefined) => {
+  const remove = (pId: string) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const next = the[keyNext] as Record<string, unknown> | undefined;
