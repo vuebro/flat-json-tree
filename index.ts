@@ -81,16 +81,20 @@ const useFlatJsonTree: (
     },
     [keyNext]: {
       get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[])[
-          (this[keyIndex] as number) + 1
-        ];
+        return (
+          (this[keySiblings] as Record<string, unknown>[])[
+            (this[keyIndex] as number) + 1
+          ] ?? null
+        );
       },
     },
     [keyPrev]: {
       get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[])[
-          (this[keyIndex] as number) - 1
-        ];
+        return (
+          (this[keySiblings] as Record<string, unknown>[])[
+            (this[keyIndex] as number) - 1
+          ] ?? null
+        );
       },
     },
   };
