@@ -1,11 +1,53 @@
-import type { Reactive } from "vue";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
+
+import type { ComputedRef, Reactive } from "vue";
 
 import { v4 } from "uuid";
 import { computed, isReactive, reactive } from "vue";
 
+/* -------------------------------------------------------------------------- */
+/*                                  Constants                                 */
+/* -------------------------------------------------------------------------- */
+
 const configurable = true;
-export default (
+
+/* -------------------------------------------------------------------------- */
+/*                                  Functions                                 */
+/* -------------------------------------------------------------------------- */
+
+const useFlatJsonTree: (
   tree: Reactive<Record<string, unknown>[]> | Record<string, unknown>[],
+  {
+    branch,
+    children,
+    id,
+    index,
+    next,
+    parent,
+    prev,
+    siblings,
+  }?: {
+    branch?: string;
+    children?: string;
+    id?: string;
+    index?: string;
+    next?: string;
+    parent?: string;
+    prev?: string;
+    siblings?: string;
+  },
+) => {
+  add: (pId: string) => null | string;
+  down: (pId: string) => void;
+  leaves: ComputedRef<Record<string, unknown>[]>;
+  left: (pId: string) => null | string;
+  remove: (pId: string) => null | string;
+  right: (pId: string) => null | string;
+  up: (pId: string) => void;
+} = (
+  tree,
   {
     branch: keyBranch = "branch",
     children: keyChildren = "children",
@@ -17,7 +59,11 @@ export default (
     siblings: keySiblings = "siblings",
   } = {},
 ) => {
-  const properties = {
+  /* -------------------------------------------------------------------------- */
+  /*                                  Constants                                 */
+  /* -------------------------------------------------------------------------- */
+
+  const properties: PropertyDescriptorMap = {
     [keyBranch]: {
       get(this: Record<string, unknown>) {
         const ret = [this];
@@ -48,10 +94,15 @@ export default (
       },
     },
   };
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  Functions                                 */
+  /* -------------------------------------------------------------------------- */
+
   const getLeaves: (
     siblings: { configurable?: boolean; value: Record<string, unknown>[] },
-    parent?: { configurable?: boolean; value?: Record<string, unknown> },
-  ) => Record<string, unknown>[] = (siblings, parent = { value: undefined }) =>
+    parent?: { configurable?: boolean; value: null | Record<string, unknown> },
+  ) => Record<string, unknown>[] = (siblings, parent = { value: null }) =>
     siblings.value.flatMap((value) => {
       Object.defineProperties(value, {
         ...properties,
@@ -69,11 +120,28 @@ export default (
         ),
       ];
     });
-  const value = (isReactive(tree) ? tree : reactive(tree)) as Reactive<
-    Record<string, unknown>[]
-  >;
-  const leaves = computed(() => getLeaves({ value }));
-  const up = (pId: string) => {
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  Constants                                 */
+  /* -------------------------------------------------------------------------- */
+
+  const value: Reactive<Record<string, unknown>[]> = isReactive(tree)
+    ? tree
+    : reactive(tree);
+
+  /* -------------------------------------------------------------------------- */
+  /*                                Computations                                */
+  /* -------------------------------------------------------------------------- */
+
+  const leaves: ComputedRef<Record<string, unknown>[]> = computed(() =>
+    getLeaves({ value }),
+  );
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  Functions                                 */
+  /* -------------------------------------------------------------------------- */
+
+  const up: (pId: string) => void = (pId) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const index = the[keyIndex] as number;
@@ -85,7 +153,10 @@ export default (
         ];
     }
   };
-  const down = (pId: string) => {
+
+  /* -------------------------------------------------------------------------- */
+
+  const down: (pId: string) => void = (pId) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
       const index = the[keyIndex] as number;
@@ -97,10 +168,13 @@ export default (
         ];
     }
   };
-  const right = (pId: string) => {
-    const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+
+  /* -------------------------------------------------------------------------- */
+
+  const right: (pId: string) => null | string = (pId: string) => {
+    const the = leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
-      const prev = the[keyPrev] as Record<string, unknown> | undefined;
+      const prev = (the[keyPrev] ?? null) as null | Record<string, unknown>;
       if (prev) {
         const children = (prev[keyChildren] ?? []) as Record<string, unknown>[];
         const id = prev[keyId] as string;
@@ -114,12 +188,15 @@ export default (
         return id;
       }
     }
-    return undefined;
+    return null;
   };
-  const left = (pId: string) => {
+
+  /* -------------------------------------------------------------------------- */
+
+  const left: (pId: string) => null | string = (pId) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
-      const parent = the[keyParent] as Record<string, unknown> | undefined;
+      const parent = (the[keyParent] ?? null) as null | Record<string, unknown>;
       if (parent) {
         const siblings = parent[keySiblings] as Record<string, unknown>[];
         if (parent[keyParent]) {
@@ -134,14 +211,17 @@ export default (
         }
       }
     }
-    return undefined;
+    return null;
   };
-  const add = (pId: string) => {
+
+  /* -------------------------------------------------------------------------- */
+
+  const add: (pId: string) => null | string = (pId) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
-      const children = the[keyChildren] as
-        | Record<string, unknown>[]
-        | undefined;
+      const children = (the[keyChildren] ?? null) as
+        | null
+        | Record<string, unknown>[];
       const index = the[keyIndex] as number;
       const siblings = the[keySiblings] as Record<string, unknown>[];
       const id = v4();
@@ -158,14 +238,17 @@ export default (
       }
       return id;
     }
-    return undefined;
+    return null;
   };
-  const remove = (pId: string) => {
+
+  /* -------------------------------------------------------------------------- */
+
+  const remove: (pId: string) => null | string = (pId) => {
     const the = leaves.value.find((leaf) => leaf[keyId] === pId);
     if (the) {
-      const next = the[keyNext] as Record<string, unknown> | undefined;
-      const parent = the[keyParent] as Record<string, unknown> | undefined;
-      const prev = the[keyPrev] as Record<string, unknown> | undefined;
+      const next = (the[keyNext] ?? null) as null | Record<string, unknown>;
+      const parent = (the[keyParent] ?? null) as null | Record<string, unknown>;
+      const prev = (the[keyPrev] ?? null) as null | Record<string, unknown>;
       if (parent) {
         let id: string;
         switch (true) {
@@ -186,7 +269,22 @@ export default (
         return id;
       }
     }
-    return undefined;
+    return null;
   };
+
+  /* -------------------------------------------------------------------------- */
+  /*                                    Main                                    */
+  /* -------------------------------------------------------------------------- */
+
   return { add, down, leaves, left, remove, right, up };
+
+  /* -------------------------------------------------------------------------- */
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                   Exports                                  */
+/* -------------------------------------------------------------------------- */
+
+export default useFlatJsonTree;
+
+/* -------------------------------------------------------------------------- */
