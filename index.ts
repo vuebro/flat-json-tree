@@ -28,7 +28,7 @@ const useFlatJsonTree: (
     parent,
     prev,
     siblings,
-  }: {
+  }?: {
     branch?: string;
     children?: string;
     id?: string;
