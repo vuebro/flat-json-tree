@@ -28,7 +28,7 @@ const useFlatJsonTree: (
     parent,
     prev,
     siblings,
-  }?: {
+  }: {
     branch?: string;
     children?: string;
     id?: string;
@@ -67,7 +67,7 @@ const useFlatJsonTree: (
     [keyBranch]: {
       get(this: Record<string, unknown>) {
         const ret = [this];
-        while (ret[0][keyParent])
+        while (ret[0]?.[keyParent])
           ret.unshift(ret[0][keyParent] as Record<string, unknown>);
         return ret;
       },
@@ -146,14 +146,19 @@ const useFlatJsonTree: (
   /* -------------------------------------------------------------------------- */
 
   const up: (pId: string) => void = (pId) => {
-    const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+    const the: null | Record<string, unknown> =
+      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
-      const index = the[keyIndex] as number;
-      const siblings = the[keySiblings] as Record<string, unknown>[];
-      if (index)
-        [siblings[index - 1], siblings[index]] = [
+      const index: number = the[keyIndex] as number;
+      const prevIndex: number = index - 1;
+      const siblings: Record<string, unknown>[] = the[keySiblings] as Record<
+        string,
+        unknown
+      >[];
+      if (index && siblings[index] && siblings[prevIndex])
+        [siblings[prevIndex], siblings[index]] = [
           siblings[index],
-          siblings[index - 1],
+          siblings[prevIndex],
         ];
     }
   };
@@ -161,13 +166,18 @@ const useFlatJsonTree: (
   /* -------------------------------------------------------------------------- */
 
   const down: (pId: string) => void = (pId) => {
-    const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+    const the: null | Record<string, unknown> =
+      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
-      const index = the[keyIndex] as number;
-      const siblings = the[keySiblings] as Record<string, unknown>[];
-      if (index < siblings.length - 1)
-        [siblings[index], siblings[index + 1]] = [
-          siblings[index + 1],
+      const index: number = the[keyIndex] as number;
+      const nextIndex: number = index + 1;
+      const siblings: Record<string, unknown>[] = the[keySiblings] as Record<
+        string,
+        unknown
+      >[];
+      if (index < siblings.length - 1 && siblings[index] && siblings[nextIndex])
+        [siblings[index], siblings[nextIndex]] = [
+          siblings[nextIndex],
           siblings[index],
         ];
     }
@@ -176,7 +186,8 @@ const useFlatJsonTree: (
   /* -------------------------------------------------------------------------- */
 
   const right: (pId: string) => null | string = (pId: string) => {
-    const the = leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
+    const the: null | Record<string, unknown> =
+      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
       const prev = (the[keyPrev] ?? null) as null | Record<string, unknown>;
       if (prev) {
@@ -198,7 +209,8 @@ const useFlatJsonTree: (
   /* -------------------------------------------------------------------------- */
 
   const left: (pId: string) => null | string = (pId) => {
-    const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+    const the: null | Record<string, unknown> =
+      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
       const parent = (the[keyParent] ?? null) as null | Record<string, unknown>;
       if (parent) {
@@ -221,7 +233,8 @@ const useFlatJsonTree: (
   /* -------------------------------------------------------------------------- */
 
   const add: (pId: string) => null | string = (pId) => {
-    const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+    const the: null | Record<string, unknown> =
+      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
       const children = (the[keyChildren] ?? null) as
         | null
@@ -248,7 +261,8 @@ const useFlatJsonTree: (
   /* -------------------------------------------------------------------------- */
 
   const remove: (pId: string) => null | string = (pId) => {
-    const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+    const the: null | Record<string, unknown> =
+      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
       const next = (the[keyNext] ?? null) as null | Record<string, unknown>;
       const parent = (the[keyParent] ?? null) as null | Record<string, unknown>;
