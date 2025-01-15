@@ -17,37 +17,8 @@ const configurable = true;
 /*                                  Functions                                 */
 /* -------------------------------------------------------------------------- */
 
-const useFlatJsonTree: (
+function useFlatJsonTree(
   tree: Reactive<Record<string, unknown>[]> | Record<string, unknown>[],
-  {
-    branch,
-    children,
-    id,
-    index,
-    next,
-    parent,
-    prev,
-    siblings,
-  }?: {
-    branch?: string;
-    children?: string;
-    id?: string;
-    index?: string;
-    next?: string;
-    parent?: string;
-    prev?: string;
-    siblings?: string;
-  },
-) => {
-  add: (pId: string) => null | string;
-  down: (pId: string) => void;
-  leaves: ComputedRef<Record<string, unknown>[]>;
-  left: (pId: string) => null | string;
-  remove: (pId: string) => null | string;
-  right: (pId: string) => null | string;
-  up: (pId: string) => void;
-} = (
-  tree,
   {
     branch: keyBranch = "branch",
     children: keyChildren = "children",
@@ -57,8 +28,25 @@ const useFlatJsonTree: (
     parent: keyParent = "parent",
     prev: keyPrev = "prev",
     siblings: keySiblings = "siblings",
+  }: {
+    branch?: string;
+    children?: string;
+    id?: string;
+    index?: string;
+    next?: string;
+    parent?: string;
+    prev?: string;
+    siblings?: string;
   } = {},
-) => {
+): {
+  add: (pId: string) => null | string;
+  down: (pId: string) => void;
+  leaves: ComputedRef<Record<string, unknown>[]>;
+  left: (pId: string) => null | string;
+  remove: (pId: string) => null | string;
+  right: (pId: string) => null | string;
+  up: (pId: string) => void;
+} {
   /* -------------------------------------------------------------------------- */
   /*                                  Constants                                 */
   /* -------------------------------------------------------------------------- */
@@ -103,11 +91,14 @@ const useFlatJsonTree: (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  const getLeaves: (
+  function getLeaves(
     siblings: { configurable?: boolean; value: Record<string, unknown>[] },
-    parent?: { configurable?: boolean; value: null | Record<string, unknown> },
-  ) => Record<string, unknown>[] = (siblings, parent = { value: null }) =>
-    siblings.value.flatMap((value) => {
+    parent: {
+      configurable?: boolean;
+      value: null | Record<string, unknown>;
+    } = { value: null },
+  ): Record<string, unknown>[] {
+    return siblings.value.flatMap((value) => {
       Object.defineProperties(value, {
         ...properties,
         [keyParent]: parent,
@@ -124,28 +115,28 @@ const useFlatJsonTree: (
         ),
       ];
     });
+  }
 
   /* -------------------------------------------------------------------------- */
-  /*                                  Constants                                 */
-  /* -------------------------------------------------------------------------- */
 
-  const value: Reactive<Record<string, unknown>[]> = isReactive(tree)
-    ? tree
-    : reactive(tree);
+  function startLeaves() {
+    const value: Reactive<Record<string, unknown>[]> = isReactive(tree)
+      ? tree
+      : reactive(tree);
+    return getLeaves({ value });
+  }
 
   /* -------------------------------------------------------------------------- */
   /*                                Computations                                */
   /* -------------------------------------------------------------------------- */
 
-  const leaves: ComputedRef<Record<string, unknown>[]> = computed(() =>
-    getLeaves({ value }),
-  );
+  const leaves: ComputedRef<Record<string, unknown>[]> = computed(startLeaves);
 
   /* -------------------------------------------------------------------------- */
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  const up: (pId: string) => void = (pId) => {
+  function up(pId: string): void {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -161,11 +152,11 @@ const useFlatJsonTree: (
           siblings[prevIndex],
         ];
     }
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const down: (pId: string) => void = (pId) => {
+  function down(pId: string): void {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -181,11 +172,11 @@ const useFlatJsonTree: (
           siblings[index],
         ];
     }
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const right: (pId: string) => null | string = (pId: string) => {
+  function right(pId: string): null | string {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -204,11 +195,11 @@ const useFlatJsonTree: (
       }
     }
     return null;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const left: (pId: string) => null | string = (pId) => {
+  function left(pId: string): null | string {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -228,11 +219,11 @@ const useFlatJsonTree: (
       }
     }
     return null;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const add: (pId: string) => null | string = (pId) => {
+  function add(pId: string): null | string {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -256,11 +247,11 @@ const useFlatJsonTree: (
       return id;
     }
     return null;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const remove: (pId: string) => null | string = (pId) => {
+  function remove(pId: string): null | string {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -288,7 +279,7 @@ const useFlatJsonTree: (
       }
     }
     return null;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
   /*                                    Main                                    */
@@ -297,7 +288,7 @@ const useFlatJsonTree: (
   return { add, down, leaves, left, remove, right, up };
 
   /* -------------------------------------------------------------------------- */
-};
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                   Exports                                  */
