@@ -6,6 +6,8 @@
   },
   "extends": [
     "eslint:recommended",
+    "airbnb-base",
+    "airbnb-typescript/base",
     "plugin:@typescript-eslint/strict-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:perfectionist/recommended-natural-legacy",
@@ -19,8 +21,6 @@
       {
         "endOfLine": "auto"
       }
-    ],
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": "error"
+    ]
   }
 }
