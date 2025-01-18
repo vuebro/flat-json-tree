@@ -118,7 +118,7 @@ function useFlatJsonTree(
   }
 
   /* -------------------------------------------------------------------------- */
-  /*                                  Variables                                 */
+  /*                                  Constants                                 */
   /* -------------------------------------------------------------------------- */
 
   const value: Reactive<Record<string, unknown>[]> = isReactive(tree)
