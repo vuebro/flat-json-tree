@@ -89,8 +89,8 @@ export default (
       configurable?: boolean;
       value: null | Record<string, unknown>;
     } = { value: null },
-  ): Record<string, unknown>[] => {
-    return siblings.value.flatMap((value) => {
+  ): Record<string, unknown>[] =>
+    siblings.value.flatMap((value) => {
       Object.defineProperties(value, {
         ...properties,
         [keyParent]: parent,
@@ -107,7 +107,6 @@ export default (
         ),
       ];
     });
-  };
 
   /* -------------------------------------------------------------------------- */
   /*                                  Reactives                                 */
@@ -121,9 +120,7 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  const startLeaves = (): Record<string, unknown>[] => {
-    return getLeaves({ value });
-  };
+  const startLeaves = (): Record<string, unknown>[] => getLeaves({ value });
 
   /* -------------------------------------------------------------------------- */
   /*                                Computations                                */
