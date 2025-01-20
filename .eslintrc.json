@@ -11,6 +11,7 @@
     "plugin:@typescript-eslint/strict-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:perfectionist/recommended-natural-legacy",
+    "plugin:sonarjs/recommended-legacy",
     "plugin:prettier/recommended"
   ],
   "plugins": ["eslint-plugin-tsdoc"],
