@@ -83,13 +83,13 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  function getLeaves(
+  const getLeaves = (
     siblings: { configurable?: boolean; value: Record<string, unknown>[] },
     parent: {
       configurable?: boolean;
       value: null | Record<string, unknown>;
     } = { value: null },
-  ): Record<string, unknown>[] {
+  ): Record<string, unknown>[] => {
     return siblings.value.flatMap((value) => {
       Object.defineProperties(value, {
         ...properties,
@@ -107,7 +107,7 @@ export default (
         ),
       ];
     });
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                  Reactives                                 */
@@ -121,9 +121,9 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  function startLeaves(): Record<string, unknown>[] {
+  const startLeaves = (): Record<string, unknown>[] => {
     return getLeaves({ value });
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                Computations                                */
@@ -135,7 +135,7 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  function add(pId: string): null | string {
+  const add = (pId: string): null | string => {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -159,11 +159,11 @@ export default (
       return id;
     }
     return null;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function down(pId: string): void {
+  const down = (pId: string): void => {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -179,11 +179,11 @@ export default (
           siblings[index],
         ];
     }
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function left(pId: string): null | string {
+  const left = (pId: string): null | string => {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -203,11 +203,11 @@ export default (
       }
     }
     return null;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function remove(pId: string): null | string {
+  const remove = (pId: string): null | string => {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -235,11 +235,11 @@ export default (
       }
     }
     return null;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function right(pId: string): null | string {
+  const right = (pId: string): null | string => {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -258,11 +258,11 @@ export default (
       }
     }
     return null;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function up(pId: string): void {
+  const up = (pId: string): void => {
     const the: null | Record<string, unknown> =
       leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
     if (the) {
@@ -278,7 +278,7 @@ export default (
           siblings[prevIndex],
         ];
     }
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                    Main                                    */
