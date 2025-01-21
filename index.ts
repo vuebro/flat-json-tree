@@ -68,28 +68,26 @@ export default (
       configurable?: boolean;
       value?: Record<string, unknown> | undefined;
     } = {},
-  ): Record<string, unknown>[] => {
-    const defineProperties = (
-      value: Record<string, unknown>,
-    ): Record<string, unknown>[] => {
-      Object.defineProperties(value, {
-        ...properties,
-        [keyParent]: parent,
-        [keySiblings]: siblings,
-      });
-      return [
-        value,
-        ...getLeaves(
-          {
-            configurable,
-            value: (value[keyChildren] ?? []) as Record<string, unknown>[],
-          },
-          { configurable, value },
-        ),
-      ];
-    };
-    return siblings.value.flatMap(defineProperties);
-  };
+  ): Record<string, unknown>[] =>
+    siblings.value.flatMap(
+      (value: Record<string, unknown>): Record<string, unknown>[] => {
+        Object.defineProperties(value, {
+          ...properties,
+          [keyParent]: parent,
+          [keySiblings]: siblings,
+        });
+        return [
+          value,
+          ...getLeaves(
+            {
+              configurable,
+              value: (value[keyChildren] ?? []) as Record<string, unknown>[],
+            },
+            { configurable, value },
+          ),
+        ];
+      },
+    );
 
   /* -------------------------------------------------------------------------- */
   /*                                  Reactives                                 */
