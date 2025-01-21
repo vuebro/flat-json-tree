@@ -14,25 +14,8 @@ export default (
     parent: keyParent = "parent",
     prev: keyPrev = "prev",
     siblings: keySiblings = "siblings",
-  }: {
-    branch?: string;
-    children?: string;
-    id?: string;
-    index?: string;
-    next?: string;
-    parent?: string;
-    prev?: string;
-    siblings?: string;
   } = {},
-): {
-  add: (pId: string) => null | string;
-  down: (pId: string) => void;
-  leaves: ComputedRef<Record<string, unknown>[]>;
-  left: (pId: string) => null | string;
-  remove: (pId: string) => null | string;
-  right: (pId: string) => null | string;
-  up: (pId: string) => void;
-} => {
+) => {
   /* -------------------------------------------------------------------------- */
   /*                                  Constants                                 */
   /* -------------------------------------------------------------------------- */
@@ -61,20 +44,16 @@ export default (
     },
     [keyNext]: {
       get(this: Record<string, unknown>) {
-        return (
-          (this[keySiblings] as Record<string, unknown>[])[
-            (this[keyIndex] as number) + 1
-          ] ?? null
-        );
+        return (this[keySiblings] as Record<string, unknown>[])[
+          (this[keyIndex] as number) + 1
+        ];
       },
     },
     [keyPrev]: {
       get(this: Record<string, unknown>) {
-        return (
-          (this[keySiblings] as Record<string, unknown>[])[
-            (this[keyIndex] as number) - 1
-          ] ?? null
-        );
+        return (this[keySiblings] as Record<string, unknown>[])[
+          (this[keyIndex] as number) - 1
+        ];
       },
     },
   };
@@ -87,8 +66,8 @@ export default (
     siblings: { configurable?: boolean; value: Record<string, unknown>[] },
     parent: {
       configurable?: boolean;
-      value: null | Record<string, unknown>;
-    } = { value: null },
+      value?: Record<string, unknown> | undefined;
+    } = {},
   ): Record<string, unknown>[] =>
     siblings.value.flatMap((value) => {
       Object.defineProperties(value, {
@@ -132,13 +111,14 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  const add = (pId: string): null | string => {
-    const the: null | Record<string, unknown> =
-      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
+  const add = (pId: string): string | undefined => {
+    const the: Record<string, unknown> | undefined = leaves.value.find(
+      (leaf) => leaf[keyId] === pId,
+    );
     if (the) {
-      const children = (the[keyChildren] ?? null) as
-        | null
-        | Record<string, unknown>[];
+      const children = the[keyChildren] as
+        | Record<string, unknown>[]
+        | undefined;
       const index = the[keyIndex] as number;
       const siblings = the[keySiblings] as Record<string, unknown>[];
       const id = v4();
@@ -155,14 +135,15 @@ export default (
       }
       return id;
     }
-    return null;
+    return undefined;
   };
 
   /* -------------------------------------------------------------------------- */
 
   const down = (pId: string): void => {
-    const the: null | Record<string, unknown> =
-      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
+    const the: Record<string, unknown> | undefined = leaves.value.find(
+      (leaf) => leaf[keyId] === pId,
+    );
     if (the) {
       const index: number = the[keyIndex] as number;
       const nextIndex: number = index + 1;
@@ -180,11 +161,12 @@ export default (
 
   /* -------------------------------------------------------------------------- */
 
-  const left = (pId: string): null | string => {
-    const the: null | Record<string, unknown> =
-      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
+  const left = (pId: string): string | undefined => {
+    const the: Record<string, unknown> | undefined = leaves.value.find(
+      (leaf) => leaf[keyId] === pId,
+    );
     if (the) {
-      const parent = (the[keyParent] ?? null) as null | Record<string, unknown>;
+      const parent = the[keyParent] as Record<string, unknown> | undefined;
       if (parent) {
         const siblings = parent[keySiblings] as Record<string, unknown>[];
         if (parent[keyParent]) {
@@ -199,18 +181,19 @@ export default (
         }
       }
     }
-    return null;
+    return undefined;
   };
 
   /* -------------------------------------------------------------------------- */
 
-  const remove = (pId: string): null | string => {
-    const the: null | Record<string, unknown> =
-      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
+  const remove = (pId: string): string | undefined => {
+    const the: Record<string, unknown> | undefined = leaves.value.find(
+      (leaf) => leaf[keyId] === pId,
+    );
     if (the) {
-      const next = (the[keyNext] ?? null) as null | Record<string, unknown>;
-      const parent = (the[keyParent] ?? null) as null | Record<string, unknown>;
-      const prev = (the[keyPrev] ?? null) as null | Record<string, unknown>;
+      const next = the[keyNext] as Record<string, unknown> | undefined;
+      const parent = the[keyParent] as Record<string, unknown> | undefined;
+      const prev = the[keyPrev] as Record<string, unknown> | undefined;
       if (parent) {
         let id: string;
         switch (true) {
@@ -231,16 +214,17 @@ export default (
         return id;
       }
     }
-    return null;
+    return undefined;
   };
 
   /* -------------------------------------------------------------------------- */
 
-  const right = (pId: string): null | string => {
-    const the: null | Record<string, unknown> =
-      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
+  const right = (pId: string): string | undefined => {
+    const the: Record<string, unknown> | undefined = leaves.value.find(
+      (leaf) => leaf[keyId] === pId,
+    );
     if (the) {
-      const prev = (the[keyPrev] ?? null) as null | Record<string, unknown>;
+      const prev = the[keyPrev] as Record<string, unknown> | undefined;
       if (prev) {
         const children = (prev[keyChildren] ?? []) as Record<string, unknown>[];
         const id = prev[keyId] as string;
@@ -254,14 +238,15 @@ export default (
         return id;
       }
     }
-    return null;
+    return undefined;
   };
 
   /* -------------------------------------------------------------------------- */
 
   const up = (pId: string): void => {
-    const the: null | Record<string, unknown> =
-      leaves.value.find((leaf) => leaf[keyId] === pId) ?? null;
+    const the: Record<string, unknown> | undefined = leaves.value.find(
+      (leaf) => leaf[keyId] === pId,
+    );
     if (the) {
       const index: number = the[keyIndex] as number;
       const prevIndex: number = index - 1;
