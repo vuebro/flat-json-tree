@@ -62,14 +62,16 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  const getLeaves = (
+  function getLeaves(
     siblings: { configurable?: boolean; value: Record<string, unknown>[] },
     parent: {
       configurable?: boolean;
       value?: Record<string, unknown> | undefined;
     } = {},
-  ): Record<string, unknown>[] =>
-    siblings.value.flatMap((value) => {
+  ): Record<string, unknown>[] {
+    function defineProperties(
+      value: Record<string, unknown>,
+    ): Record<string, unknown>[] {
       Object.defineProperties(value, {
         ...properties,
         [keyParent]: parent,
@@ -85,7 +87,9 @@ export default (
           { configurable, value },
         ),
       ];
-    });
+    }
+    return siblings.value.flatMap(defineProperties);
+  }
 
   /* -------------------------------------------------------------------------- */
   /*                                  Reactives                                 */
@@ -96,22 +100,18 @@ export default (
     : reactive(tree);
 
   /* -------------------------------------------------------------------------- */
-  /*                                  Functions                                 */
-  /* -------------------------------------------------------------------------- */
-
-  const startLeaves = (): Record<string, unknown>[] => getLeaves({ value });
-
-  /* -------------------------------------------------------------------------- */
   /*                                Computations                                */
   /* -------------------------------------------------------------------------- */
 
-  const leaves: ComputedRef<Record<string, unknown>[]> = computed(startLeaves);
+  const leaves: ComputedRef<Record<string, unknown>[]> = computed(() =>
+    getLeaves({ value }),
+  );
 
   /* -------------------------------------------------------------------------- */
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  const add = (pId: string): string | undefined => {
+  function add(pId: string): string | undefined {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -136,11 +136,11 @@ export default (
       return id;
     }
     return undefined;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const down = (pId: string): void => {
+  function down(pId: string): void {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -157,11 +157,11 @@ export default (
           siblings[index],
         ];
     }
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const left = (pId: string): string | undefined => {
+  function left(pId: string): string | undefined {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -182,11 +182,11 @@ export default (
       }
     }
     return undefined;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const remove = (pId: string): string | undefined => {
+  function remove(pId: string): string | undefined {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -215,11 +215,11 @@ export default (
       }
     }
     return undefined;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const right = (pId: string): string | undefined => {
+  function right(pId: string): string | undefined {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -239,11 +239,11 @@ export default (
       }
     }
     return undefined;
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
 
-  const up = (pId: string): void => {
+  function up(pId: string): void {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -260,7 +260,7 @@ export default (
           siblings[prevIndex],
         ];
     }
-  };
+  }
 
   /* -------------------------------------------------------------------------- */
   /*                                    Main                                    */
