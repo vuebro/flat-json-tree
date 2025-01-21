@@ -62,16 +62,16 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  function getLeaves(
+  const getLeaves = (
     siblings: { configurable?: boolean; value: Record<string, unknown>[] },
     parent: {
       configurable?: boolean;
       value?: Record<string, unknown> | undefined;
     } = {},
-  ): Record<string, unknown>[] {
-    function defineProperties(
+  ): Record<string, unknown>[] => {
+    const defineProperties = (
       value: Record<string, unknown>,
-    ): Record<string, unknown>[] {
+    ): Record<string, unknown>[] => {
       Object.defineProperties(value, {
         ...properties,
         [keyParent]: parent,
@@ -87,9 +87,9 @@ export default (
           { configurable, value },
         ),
       ];
-    }
+    };
     return siblings.value.flatMap(defineProperties);
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                  Reactives                                 */
@@ -111,7 +111,7 @@ export default (
   /*                                  Functions                                 */
   /* -------------------------------------------------------------------------- */
 
-  function add(pId: string): string | undefined {
+  const add = (pId: string): string | undefined => {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -136,11 +136,11 @@ export default (
       return id;
     }
     return undefined;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function down(pId: string): void {
+  const down = (pId: string): void => {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -157,11 +157,11 @@ export default (
           siblings[index],
         ];
     }
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function left(pId: string): string | undefined {
+  const left = (pId: string): string | undefined => {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -182,11 +182,11 @@ export default (
       }
     }
     return undefined;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function remove(pId: string): string | undefined {
+  const remove = (pId: string): string | undefined => {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -215,11 +215,11 @@ export default (
       }
     }
     return undefined;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function right(pId: string): string | undefined {
+  const right = (pId: string): string | undefined => {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -239,11 +239,11 @@ export default (
       }
     }
     return undefined;
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
 
-  function up(pId: string): void {
+  const up = (pId: string): void => {
     const the: Record<string, unknown> | undefined = leaves.value.find(
       (leaf) => leaf[keyId] === pId,
     );
@@ -260,7 +260,7 @@ export default (
           siblings[prevIndex],
         ];
     }
-  }
+  };
 
   /* -------------------------------------------------------------------------- */
   /*                                    Main                                    */
