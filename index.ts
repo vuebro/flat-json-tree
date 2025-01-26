@@ -51,8 +51,6 @@ export default (
       },
     };
 
-  /* -------------------------------------------------------------------------- */
-
   const getLeaves = (
     siblings: { configurable?: boolean; value: Record<string, unknown>[] },
     parent = {},
@@ -75,11 +73,7 @@ export default (
       ];
     });
 
-  /* -------------------------------------------------------------------------- */
-
   const value = isReactive(tree) ? tree : reactive(tree);
-
-  /* -------------------------------------------------------------------------- */
 
   const leaves = computed(() => getLeaves({ value }));
 
