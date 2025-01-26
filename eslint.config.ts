@@ -15,11 +15,7 @@ import eslintrc from "./.eslintrc.json";
 const projectService = true,
   tsconfigRootDir = import.meta.dirname;
 
-/* -------------------------------------------------------------------------- */
-
 const parserOptions = { projectService, tsconfigRootDir };
-
-/* -------------------------------------------------------------------------- */
 
 const compat = new FlatCompat(),
   ignores = ["index.js", "index.d.ts"],
