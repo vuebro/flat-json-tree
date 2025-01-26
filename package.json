@@ -1,6 +1,6 @@
 {
   "name": "@vues3/flat-json-tree",
-  "version": "0.3.30",
+  "version": "0.3.31",
   "type": "module",
   "scripts": {
     "lint": "bun --bun run eslint .",
