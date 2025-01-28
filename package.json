@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "bun --bun run build.ts"
+    "build": "bun --bun build.ts"
   },
   "dependencies": {
     "uuid": "^11.0.5",
