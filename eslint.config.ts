@@ -13,7 +13,7 @@ import eslintrc from "./.eslintrc.json";
 /* -------------------------------------------------------------------------- */
 
 const compat = new FlatCompat(),
-  ignores = ["index.js", "index.d.ts"],
+  ignores = ["**/index.js", "**/index.d.ts"],
   projectService = true,
   tsconfigRootDir = import.meta.dirname,
   parserOptions = { projectService, tsconfigRootDir },
@@ -21,6 +21,13 @@ const compat = new FlatCompat(),
   rules: FlatConfig.Rules = {
     "@typescript-eslint/no-shadow": "error",
     "@typescript-eslint/no-use-before-define": "error",
+    "import-x/no-extraneous-dependencies": [
+      "error",
+      {
+        devDependencies: ["**/eslint.config.ts", "**/build.ts"],
+        optionalDependencies: false,
+      },
+    ],
     "no-shadow": "off",
     "no-use-before-define": "off",
   };
