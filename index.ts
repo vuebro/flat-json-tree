@@ -77,14 +77,18 @@ export default (
 
   const leaves = computed(() => getLeaves({ value }));
 
+  const atlas = computed(
+    () => new Map(leaves.value.map((leaf) => [leaf[keyId], leaf])),
+  );
+
   const add = (pId: string) => {
-      const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+      const the = atlas.value.get(pId);
       if (the) {
         const children = the[keyChildren] as
-          | Record<string, unknown>[]
-          | undefined;
-        const index = the[keyIndex] as number;
-        const siblings = the[keySiblings] as Record<string, unknown>[];
+            | Record<string, unknown>[]
+            | undefined,
+          index = the[keyIndex] as number,
+          siblings = the[keySiblings] as Record<string, unknown>[];
         const id = v4();
         switch (true) {
           case !!the[keyParent]:
@@ -102,11 +106,11 @@ export default (
       return undefined;
     },
     down = (pId: string) => {
-      const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+      const the = atlas.value.get(pId);
       if (the) {
-        const index = the[keyIndex] as number;
-        const nextIndex = index + 1;
-        const siblings = the[keySiblings] as Record<string, unknown>[];
+        const index = the[keyIndex] as number,
+          nextIndex = index + 1,
+          siblings = the[keySiblings] as Record<string, unknown>[];
         if (
           index < siblings.length - 1 &&
           siblings[index] &&
@@ -119,69 +123,58 @@ export default (
       }
     },
     left = (pId: string) => {
-      const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+      const the = atlas.value.get(pId);
       if (the) {
         const parent = the[keyParent] as Record<string, unknown> | undefined;
-        if (parent) {
-          const siblings = parent[keySiblings] as Record<string, unknown>[];
-          if (parent[keyParent]) {
-            siblings.splice(
-              (parent[keyIndex] as number) + 1,
-              0,
-              ...(
-                (parent[keyChildren] ?? []) as Record<string, unknown>[]
-              ).splice(the[keyIndex] as number, 1),
-            );
-            return parent[keyId] as string;
-          }
+        if (parent?.[keyParent]) {
+          const children = (parent[keyChildren] ?? []) as Record<
+              string,
+              unknown
+            >[],
+            siblings = parent[keySiblings] as Record<string, unknown>[];
+          siblings.splice(
+            (parent[keyIndex] as number) + 1,
+            0,
+            ...children.splice(the[keyIndex] as number, 1),
+          );
+          return parent[keyId] as string;
         }
       }
       return undefined;
     },
     remove = (pId: string) => {
-      const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+      const the = atlas.value.get(pId);
       if (the) {
-        const next = the[keyNext];
-        const parent = the[keyParent];
-        const prev = the[keyPrev];
+        const parent = the[keyParent] as Record<string, unknown> | undefined;
         if (parent) {
-          let id: string;
-          switch (true) {
-            case !!next:
-              ({ id } = next as { id: string });
-              break;
-            case !!prev:
-              ({ id } = prev as { id: string });
-              break;
-            default:
-              ({ id } = parent as { id: string });
-          }
-          (the[keySiblings] as Record<string, unknown>[]).splice(
-            the[keyIndex] as number,
-            1,
-          );
-          if (!id) [{ id }] = leaves.value as [{ id: string }];
+          const [root] = leaves.value,
+            next = the[keyNext] as Record<string, unknown> | undefined,
+            prev = the[keyPrev] as Record<string, unknown> | undefined,
+            id = (next?.[keyId] ??
+              prev?.[keyId] ??
+              parent[keyId] ??
+              root?.[keyId]) as string,
+            siblings = the[keySiblings] as Record<string, unknown>[];
+          siblings.splice(the[keyIndex] as number, 1);
           return id;
         }
       }
       return undefined;
     },
     right = (pId: string) => {
-      const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+      const the = atlas.value.get(pId);
       if (the) {
         const prev = the[keyPrev] as Record<string, unknown> | undefined;
         if (prev) {
           const children = (prev[keyChildren] ?? []) as Record<
-            string,
-            unknown
-          >[];
-          const id = prev[keyId] as string;
+              string,
+              unknown
+            >[],
+            id = prev[keyId] as string,
+            siblings = the[keySiblings] as Record<string, unknown>[];
           prev[keyChildren] = [
             ...children,
-            ...(the[keySiblings] as Record<string, unknown>[]).splice(
-              the[keyIndex] as number,
-              1,
-            ),
+            ...siblings.splice(the[keyIndex] as number, 1),
           ];
           return id;
         }
@@ -189,11 +182,11 @@ export default (
       return undefined;
     },
     up = (pId: string) => {
-      const the = leaves.value.find((leaf) => leaf[keyId] === pId);
+      const the = atlas.value.get(pId);
       if (the) {
-        const index = the[keyIndex] as number;
-        const prevIndex = index - 1;
-        const siblings = the[keySiblings] as Record<string, unknown>[];
+        const index = the[keyIndex] as number,
+          prevIndex = index - 1,
+          siblings = the[keySiblings] as Record<string, unknown>[];
         if (index && siblings[index] && siblings[prevIndex])
           [siblings[prevIndex], siblings[index]] = [
             siblings[index],
@@ -204,5 +197,5 @@ export default (
 
   /* -------------------------------------------------------------------------- */
 
-  return { add, down, leaves, left, remove, right, up };
+  return { add, atlas, down, leaves, left, remove, right, up };
 };
