@@ -78,7 +78,7 @@ export default (
   const leaves = computed(() => getLeaves({ value }));
 
   const atlas = computed(
-    () => new Map(leaves.value.map((leaf) => [leaf[keyId], leaf])),
+    () => new Map(leaves.value.map((leaf) => [leaf[keyId] as string, leaf])),
   );
 
   const add = (pId: string) => {
