@@ -1,12 +1,11 @@
-import type { Reactive } from "vue";
-
+import { toReactive } from "@vueuse/core";
 import { v4 } from "uuid";
 import { computed, isReactive, reactive } from "vue";
 
 /* -------------------------------------------------------------------------- */
 
 export default (
-  tree: Reactive<Record<string, unknown>[]> | Record<string, unknown>[],
+  tree: Record<string, unknown>[],
   {
     branch: keyBranch = "branch",
     children: keyChildren = "children",
@@ -77,14 +76,16 @@ export default (
 
   const leaves = computed(() => getLeaves({ value }));
 
-  const atlas = computed(() =>
-    Object.fromEntries(
-      leaves.value.map((leaf) => [leaf[keyId] as string, leaf]),
+  const atlas: Record<string, Record<string, unknown>> = toReactive(
+    computed(() =>
+      Object.fromEntries(
+        leaves.value.map((leaf) => [leaf[keyId] as string, leaf]),
+      ),
     ),
   );
 
   const add = (pId: string) => {
-      const the = atlas.value[pId];
+      const the = atlas[pId];
       if (the) {
         const children = the[keyChildren] as
             | Record<string, unknown>[]
@@ -108,7 +109,7 @@ export default (
       return undefined;
     },
     down = (pId: string) => {
-      const the = atlas.value[pId];
+      const the = atlas[pId];
       if (the) {
         const index = the[keyIndex] as number,
           nextIndex = index + 1,
@@ -125,7 +126,7 @@ export default (
       }
     },
     left = (pId: string) => {
-      const the = atlas.value[pId];
+      const the = atlas[pId];
       if (the) {
         const parent = the[keyParent] as Record<string, unknown> | undefined;
         if (parent?.[keyParent]) {
@@ -145,7 +146,7 @@ export default (
       return undefined;
     },
     remove = (pId: string) => {
-      const the = atlas.value[pId];
+      const the = atlas[pId];
       if (the) {
         const parent = the[keyParent] as Record<string, unknown> | undefined;
         if (parent) {
@@ -164,7 +165,7 @@ export default (
       return undefined;
     },
     right = (pId: string) => {
-      const the = atlas.value[pId];
+      const the = atlas[pId];
       if (the) {
         const prev = the[keyPrev] as Record<string, unknown> | undefined;
         if (prev) {
@@ -184,7 +185,7 @@ export default (
       return undefined;
     },
     up = (pId: string) => {
-      const the = atlas.value[pId];
+      const the = atlas[pId];
       if (the) {
         const index = the[keyIndex] as number,
           prevIndex = index - 1,
