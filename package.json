@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "bun build.ts"
+    "build": "tsc && bun build.ts"
   },
   "dependencies": {
     "@vueuse/core": "12.5.0",
