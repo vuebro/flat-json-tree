@@ -15,8 +15,7 @@ const ignores = ["**/index.js", "**/index.d.ts"],
   parserOptions = { projectService, tsconfigRootDir },
   languageOptions = { parserOptions },
   rules: FlatConfig.Rules = {
-    "@typescript-eslint/no-shadow": "error",
-    "@typescript-eslint/no-use-before-define": "error",
+    "@typescript-eslint/no-use-before-define": ["error", "nofunc"],
     "import-x/no-extraneous-dependencies": [
       "error",
       {
@@ -24,8 +23,6 @@ const ignores = ["**/index.js", "**/index.d.ts"],
         optionalDependencies: false,
       },
     ],
-    "no-shadow": "off",
-    "no-use-before-define": "off",
   };
 
 /* -------------------------------------------------------------------------- */
