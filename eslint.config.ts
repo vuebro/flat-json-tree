@@ -36,7 +36,6 @@ export default tseslint.config(
   eslintPluginImportX.flatConfigs.typescript,
   configs.strictTypeChecked,
   configs.stylisticTypeChecked,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   sonarjs.recommended,
   perfectionist.configs["recommended-natural"],
   eslintPluginPrettierRecommended,
