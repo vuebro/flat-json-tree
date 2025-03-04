@@ -15,9 +15,7 @@ export default function (
     siblings: keySiblings = "siblings",
   } = {},
 ) {
-  const atlas = toReactive(computed(getAtlas)),
-    configurable = true,
-    leaves = computed(getLeaves),
+  const configurable = true,
     properties = {
       [keyBranch]: {
         get(this: Record<string, unknown>) {
@@ -50,6 +48,10 @@ export default function (
       },
     },
     value = isReactive(tree) ? tree : reactive(tree);
+
+  const leaves = computed(getLeaves);
+
+  const atlas = toReactive(computed(getAtlas));
 
   function getLeaves() {
     return getSiblingLeaves({ value });
