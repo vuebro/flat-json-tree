@@ -51,7 +51,8 @@ export default function (
 
   const leaves = computed(getLeaves);
 
-  const atlas = toReactive(computed(getAtlas));
+  const arrLeaves = toReactive(leaves),
+    objLeaves = toReactive(computed(getObjLeaves));
 
   function getLeaves() {
     return getSiblingLeaves({ value });
@@ -83,7 +84,7 @@ export default function (
     return siblings.value.flatMap(defineProperties);
   }
 
-  function getAtlas() {
+  function getObjLeaves() {
     return Object.fromEntries(leaves.value.map(getLeafEntry));
   }
 
@@ -94,7 +95,7 @@ export default function (
   }
 
   function add(pId: string) {
-    const the = atlas[pId];
+    const the = objLeaves[pId];
     if (the) {
       const children = the[keyChildren] as
           | Record<string, unknown>[]
@@ -119,7 +120,7 @@ export default function (
   }
 
   function down(pId: string) {
-    const the = atlas[pId];
+    const the = objLeaves[pId];
     if (the) {
       const index = the[keyIndex] as number,
         nextIndex = index + 1,
@@ -133,7 +134,7 @@ export default function (
   }
 
   function left(pId: string) {
-    const the = atlas[pId];
+    const the = objLeaves[pId];
     if (the) {
       const parent = the[keyParent] as Record<string, unknown> | undefined;
       if (parent?.[keyParent]) {
@@ -154,7 +155,7 @@ export default function (
   }
 
   function remove(pId: string) {
-    const the = atlas[pId];
+    const the = objLeaves[pId];
     if (the) {
       const parent = the[keyParent] as Record<string, unknown> | undefined;
       if (parent) {
@@ -174,7 +175,7 @@ export default function (
   }
 
   function right(pId: string) {
-    const the = atlas[pId];
+    const the = objLeaves[pId];
     if (the) {
       const prev = the[keyPrev] as Record<string, unknown> | undefined;
       if (prev) {
@@ -192,7 +193,7 @@ export default function (
   }
 
   function up(pId: string) {
-    const the = atlas[pId];
+    const the = objLeaves[pId];
     if (the) {
       const index = the[keyIndex] as number,
         prevIndex = index - 1,
@@ -205,5 +206,5 @@ export default function (
     }
   }
 
-  return { add, atlas, down, leaves, left, remove, right, up };
+  return { add, arrLeaves, down, leaves, left, objLeaves, remove, right, up };
 }
