@@ -31,15 +31,14 @@
     "url": "git+https://github.com/vues3/flat-json-tree.git"
   },
   "keywords": [
-    "vue",
-    "flat-json-tree",
+    "flat",
     "tree",
-    "json",
-    "flattering",
-    "composable"
+    "tree search",
+    "tree object",
+    "json tree object"
   ],
   "author": "jbruwes",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/vues3/flat-json-tree/issues"
   },
