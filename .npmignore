@@ -1,10 +1,7 @@
 .github/
 .vscode/
-src/
-.eslintignore
-.eslintrc.json
 .prettierrc.json
-build.ts
-bun.lockb
+eslint.config.ts
+package-lock.json
 index.ts
 tsconfig.json
