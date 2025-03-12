@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tsc && bun build.ts"
+    "build": "tsc --emitDeclarationOnly && bun build ./index.ts --external vue --outdir ."
   },
   "dependencies": {
     "@vueuse/core": "13.0.0",
@@ -15,7 +15,6 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@types/bun": "^1.2.5",
-    "bun-plugin-dts": "^0.3.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-import-resolver-typescript": "^3.8.5",
     "eslint-plugin-import-x": "^4.6.1",
