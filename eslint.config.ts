@@ -9,8 +9,9 @@ import tseslint, { configs } from "typescript-eslint";
 
 /* -------------------------------------------------------------------------- */
 
-const ignores = ["**/index.js", "**/index.d.ts"],
-  projectService = true,
+const allowDefaultProject = ["eslint.config.ts"],
+  ignores = ["**/index.js", "**/index.d.ts"],
+  projectService = { allowDefaultProject },
   tsconfigRootDir = import.meta.dirname,
   parserOptions = { projectService, tsconfigRootDir },
   languageOptions = { parserOptions },
@@ -19,7 +20,7 @@ const ignores = ["**/index.js", "**/index.d.ts"],
     "import-x/no-extraneous-dependencies": [
       "error",
       {
-        devDependencies: ["**/eslint.config.ts", "**/build.ts"],
+        devDependencies: ["**/eslint.config.ts"],
         optionalDependencies: false,
       },
     ],
