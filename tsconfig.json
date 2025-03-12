@@ -8,13 +8,14 @@
     "moduleDetection": "force",
     "isolatedModules": true,
     "module": "preserve",
-    "noEmit": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "strict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noImplicitOverride": true,
     "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true
-  }
+    "noUncheckedIndexedAccess": true,
+    "declaration": true
+  },
+  "include": ["./index.ts"]
 }
