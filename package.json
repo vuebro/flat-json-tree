@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tsc --emitDeclarationOnly && bun build ./index.ts --external vue --outdir ."
+    "build": "tsc --emitDeclarationOnly && bun build ./index.ts --minify --external vue --outdir ."
   },
   "dependencies": {
     "@vueuse/core": "13.0.0",
