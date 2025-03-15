@@ -14,50 +14,55 @@ export default (
     siblings: keySiblings = "siblings",
   } = {},
 ) => {
-  const configurable: PropertyDescriptor["configurable"] = true,
-    getLeaves = (
+  const properties: PropertyDescriptorMap = {
+    [keyBranch]: {
+      get(this: Record<string, unknown>) {
+        const ret = [this];
+        while (ret[0]?.[keyParent])
+          ret.unshift(ret[0][keyParent] as Record<string, unknown>);
+        return ret;
+      },
+    },
+    [keyIndex]: {
+      get(this: Record<string, unknown>) {
+        return (this[keySiblings] as Record<string, unknown>[]).findIndex(
+          (sibling) => this[keyId] === sibling[keyId],
+        );
+      },
+    },
+    [keyNext]: {
+      get(this: Record<string, unknown>) {
+        return (this[keySiblings] as Record<string, unknown>[])[
+          (this[keyIndex] as number) + 1
+        ];
+      },
+    },
+    [keyPrev]: {
+      get(this: Record<string, unknown>) {
+        return (this[keySiblings] as Record<string, unknown>[])[
+          (this[keyIndex] as number) - 1
+        ];
+      },
+    },
+  };
+  const getLeaves = (
       siblings: { configurable?: boolean; value: Record<string, unknown>[] },
       parent = {},
     ) =>
       siblings.value.flatMap((value): Record<string, unknown>[] => {
         Object.defineProperties(value, {
-          [keyBranch]: {
-            get: () => {
-              const ret = [value];
-              while (ret[0]?.[keyParent])
-                ret.unshift(ret[0][keyParent] as Record<string, unknown>);
-              return ret;
-            },
-          },
-          [keyIndex]: {
-            get: () =>
-              (value[keySiblings] as Record<string, unknown>[]).findIndex(
-                (sibling) => value[keyId] === sibling[keyId],
-              ),
-          },
-          [keyNext]: {
-            get: () =>
-              (value[keySiblings] as Record<string, unknown>[])[
-                (value[keyIndex] as number) + 1
-              ],
-          },
+          ...properties,
           [keyParent]: parent,
-          [keyPrev]: {
-            get: () =>
-              (value[keySiblings] as Record<string, unknown>[])[
-                (value[keyIndex] as number) - 1
-              ],
-          },
           [keySiblings]: siblings,
         });
         return [
           value,
           ...getLeaves(
             {
-              configurable,
+              configurable: true,
               value: (value[keyChildren] ?? []) as Record<string, unknown>[],
             },
-            { configurable, value },
+            { configurable: true, value },
           ),
         ];
       }),
