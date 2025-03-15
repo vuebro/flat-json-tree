@@ -1,7 +1,6 @@
 import { toReactive } from "@vueuse/core";
 import { v4 } from "uuid";
 import { computed, isReactive, reactive } from "vue";
-
 export default (
   tree: Record<string, unknown>[],
   {
@@ -16,47 +15,39 @@ export default (
   } = {},
 ) => {
   const configurable: PropertyDescriptor["configurable"] = true,
-    properties: PropertyDescriptorMap = {
-      [keyBranch]: {
-        get(this: Record<string, unknown>) {
-          const ret = [this];
-          while (ret[0]?.[keyParent])
-            ret.unshift(ret[0][keyParent] as Record<string, unknown>);
-          return ret;
-        },
-      },
-      [keyIndex]: {
-        get(this: Record<string, unknown>) {
-          return (this[keySiblings] as Record<string, unknown>[]).findIndex(
-            (sibling) => this[keyId] === sibling[keyId],
-          );
-        },
-      },
-      [keyNext]: {
-        get(this: Record<string, unknown>) {
-          return (this[keySiblings] as Record<string, unknown>[])[
-            (this[keyIndex] as number) + 1
-          ];
-        },
-      },
-      [keyPrev]: {
-        get(this: Record<string, unknown>) {
-          return (this[keySiblings] as Record<string, unknown>[])[
-            (this[keyIndex] as number) - 1
-          ];
-        },
-      },
-    },
-    value = isReactive(tree) ? tree : reactive(tree);
-
-  const getLeaves = (
+    getLeaves = (
       siblings: { configurable?: boolean; value: Record<string, unknown>[] },
       parent = {},
     ) =>
       siblings.value.flatMap((value): Record<string, unknown>[] => {
         Object.defineProperties(value, {
-          ...properties,
+          [keyBranch]: {
+            get: () => {
+              const ret = [value];
+              while (ret[0]?.[keyParent])
+                ret.unshift(ret[0][keyParent] as Record<string, unknown>);
+              return ret;
+            },
+          },
+          [keyIndex]: {
+            get: () =>
+              (value[keySiblings] as Record<string, unknown>[]).findIndex(
+                (sibling) => value[keyId] === sibling[keyId],
+              ),
+          },
+          [keyNext]: {
+            get: () =>
+              (value[keySiblings] as Record<string, unknown>[])[
+                (value[keyIndex] as number) + 1
+              ],
+          },
           [keyParent]: parent,
+          [keyPrev]: {
+            get: () =>
+              (value[keySiblings] as Record<string, unknown>[])[
+                (value[keyIndex] as number) - 1
+              ],
+          },
           [keySiblings]: siblings,
         });
         return [
@@ -70,9 +61,9 @@ export default (
           ),
         ];
       }),
-    leaves = computed(() => getLeaves({ value }));
-
-  const arrLeaves = toReactive(leaves),
+    leaves = computed(() =>
+      getLeaves({ value: isReactive(tree) ? tree : reactive(tree) }),
+    ),
     objLeaves = toReactive(
       computed(() =>
         Object.fromEntries(
@@ -80,8 +71,8 @@ export default (
         ),
       ),
     );
-
-  const add = (pId: string) => {
+  return {
+    add: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
         const children = the[keyChildren] as
@@ -105,7 +96,8 @@ export default (
       }
       return undefined;
     },
-    down = (pId: string) => {
+    arrLeaves: toReactive(leaves),
+    down: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
         const index = the[keyIndex] as number,
@@ -122,7 +114,8 @@ export default (
           ];
       }
     },
-    left = (pId: string) => {
+    leaves,
+    left: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
         const parent = the[keyParent] as Record<string, unknown> | undefined;
@@ -142,7 +135,8 @@ export default (
       }
       return undefined;
     },
-    remove = (pId: string) => {
+    objLeaves,
+    remove: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
         const parent = the[keyParent] as Record<string, unknown> | undefined;
@@ -161,7 +155,7 @@ export default (
       }
       return undefined;
     },
-    right = (pId: string) => {
+    right: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
         const prev = the[keyPrev] as Record<string, unknown> | undefined;
@@ -181,7 +175,7 @@ export default (
       }
       return undefined;
     },
-    up = (pId: string) => {
+    up: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
         const index = the[keyIndex] as number,
@@ -193,7 +187,6 @@ export default (
             siblings[prevIndex],
           ];
       }
-    };
-
-  return { add, arrLeaves, down, leaves, left, objLeaves, remove, right, up };
+    },
+  };
 };
