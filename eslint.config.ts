@@ -3,7 +3,6 @@ import eslintPluginImportX from "eslint-plugin-import-x";
 import perfectionist from "eslint-plugin-perfectionist";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import tseslint, { configs } from "typescript-eslint";
-
 export default tseslint.config(
   { ignores: ["**/index.js", "**/index.d.ts"] },
   {
