@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: latest
           registry-url: "https://registry.npmjs.org"
+          scope: "@vues3"
       - run: npm ci
       - run: bun run build
       - run: npm publish --provenance --access public
