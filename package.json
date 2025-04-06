@@ -13,11 +13,11 @@
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@eslint/js": "^9.23.0",
+    "@eslint/js": "^9.24.0",
     "@types/bun": "^1.2.8",
     "eslint-config-prettier": "^10.1.1",
     "eslint-import-resolver-typescript": "^4.3.1",
-    "eslint-plugin-import-x": "^4.10.0",
+    "eslint-plugin-import-x": "^4.10.1",
     "eslint-plugin-perfectionist": "^4.11.0",
     "eslint-plugin-prettier": "^5.2.6",
     "jiti": "^2.4.2",
