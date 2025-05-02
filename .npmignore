@@ -1,7 +1,5 @@
 .github/
 .vscode/
-.prettierrc.json
+src/
 eslint.config.ts
-package-lock.json
-index.ts
 tsconfig.json
