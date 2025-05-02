@@ -2,10 +2,12 @@
   "name": "@vues3/flat-json-tree",
   "version": "0.6.37",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tsc && bun build ./index.ts --packages external --outdir ."
+    "build": "tsc"
   },
   "dependencies": {
     "@vueuse/core": "13.1.0",
@@ -14,14 +16,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",
-    "@types/bun": "^1.2.10",
+    "@types/node": "^22.15.3",
     "eslint-config-prettier": "^10.1.2",
     "eslint-import-resolver-typescript": "^4.3.4",
-    "eslint-plugin-import-x": "^4.10.6",
-    "eslint-plugin-perfectionist": "^4.12.2",
+    "eslint-plugin-import-x": "^4.11.0",
+    "eslint-plugin-perfectionist": "^4.12.3",
     "eslint-plugin-prettier": "^5.2.6",
     "jiti": "^2.4.2",
-    "typescript-eslint": "^8.31.0"
+    "typescript-eslint": "^8.31.1"
   },
   "repository": {
     "type": "git",
@@ -37,7 +39,10 @@
     "tree object",
     "json tree object"
   ],
-  "author": "jbruwes",
+  "author": {
+    "name": "Jerry Bruwes",
+    "email": "jbruwes@gmail.com"
+  },
   "license": "AGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/vues3/flat-json-tree/issues"
