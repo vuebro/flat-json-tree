@@ -4,7 +4,7 @@ import perfectionist from "eslint-plugin-perfectionist";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import tseslint, { configs } from "typescript-eslint";
 export default tseslint.config(
-  { ignores: ["**/index.js", "**/index.d.ts"] },
+  { ignores: ["**/dist"] },
   {
     rules: {
       "@typescript-eslint/no-use-before-define": ["error", "nofunc"],
@@ -15,6 +15,7 @@ export default tseslint.config(
           optionalDependencies: false,
         },
       ],
+      "no-use-before-define": "off",
     },
   },
   {
