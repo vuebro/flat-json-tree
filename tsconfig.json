@@ -4,7 +4,6 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "isolatedModules": true,
@@ -13,10 +12,11 @@
     "moduleDetection": "force",
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
+    "outDir": "dist",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext"
   },
-  "include": ["./index.ts"]
+  "include": ["./src/**/*.ts"]
 }
