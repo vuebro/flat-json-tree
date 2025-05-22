@@ -1,5 +1,5 @@
 {
-  "name": "@vues3/flat-json-tree",
+  "name": "@vuebro/flat-json-tree",
   "version": "0.7.8",
   "type": "module",
   "main": "dist/index.js",
@@ -15,10 +15,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
-    "@types/node": "^22.15.18",
+    "@types/node": "^22.15.21",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-import-resolver-typescript": "^4.3.4",
-    "eslint-plugin-import-x": "^4.11.1",
+    "eslint-import-resolver-typescript": "^4.3.5",
+    "eslint-plugin-import-x": "^4.12.2",
     "eslint-plugin-perfectionist": "^4.13.0",
     "eslint-plugin-prettier": "^5.4.0",
     "jiti": "^2.4.2",
@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vues3/flat-json-tree.git"
+    "url": "git+https://github.com/vuebro/flat-json-tree.git"
   },
   "keywords": [
     "flat",
@@ -44,8 +44,8 @@
   },
   "license": "AGPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/vues3/flat-json-tree/issues"
+    "url": "https://github.com/vuebro/flat-json-tree/issues"
   },
-  "homepage": "https://github.com/vues3/flat-json-tree#readme",
-  "description": "@vues3/flat-json-tree"
+  "homepage": "https://github.com/vuebro/flat-json-tree#readme",
+  "description": "@vuebro/flat-json-tree"
 }
