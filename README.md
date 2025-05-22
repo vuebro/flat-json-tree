@@ -81,7 +81,7 @@ The composable returns an object with the following properties:
 
 ```bash
 
-npm i @vues3/flat-json-tree
+npm i @vuebro/flat-json-tree
 
 ```
 
@@ -100,7 +100,7 @@ Assume we have a tree structure with elements like:
 ### Example using `useFlatJsonTree` composable
 
 ```js
-import useFlatJsonTree from "@vues3/flat-json-tree";
+import useFlatJsonTree from "@vuebro/flat-json-tree";
 
 const tree = [
   {
@@ -325,7 +325,7 @@ As a result, the objects named "1.2.5" and "1.2.6" have swapped positions:
 
 > [!NOTE]
 >
-> <img src="https://vues3.ru/images/drakkar.svg" width="250"/>
+> <img src="https://vuebro.ru/images/drakkar.svg" width="250"/>
 >
 > Made on the shores of the Baltic Sea
 
