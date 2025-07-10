@@ -1,6 +1,6 @@
 import { toReactive } from "@vueuse/core";
-import { v4 } from "uuid";
 import { computed, isReactive, reactive } from "vue";
+
 export default (
   tree: Record<string, unknown>[],
   {
@@ -85,7 +85,7 @@ export default (
             | undefined,
           index = the[keyIndex] as number,
           siblings = the[keySiblings] as Record<string, unknown>[];
-        const id = v4();
+        const id = Date.now().toString(36);
         switch (true) {
           case !!the[keyParent]:
             siblings.splice(index + 1, 0, { [keyId]: id });
