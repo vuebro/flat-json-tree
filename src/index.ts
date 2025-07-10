@@ -85,7 +85,9 @@ export default (
             | undefined,
           index = the[keyIndex] as number,
           siblings = the[keySiblings] as Record<string, unknown>[];
-        const id = Date.now().toString(36);
+        const id = ((performance.now() * Math.random()) % 1)
+          .toString(36)
+          .slice(2);
         switch (true) {
           case !!the[keyParent]:
             siblings.splice(index + 1, 0, { [keyId]: id });
