@@ -80,9 +80,11 @@ export default (
     add: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
-        const url = URL.createObjectURL(new Blob()),
-          [id] = url.split("/").reverse(),
-          children = the[keyChildren] as Record<string, unknown>[] | undefined,
+        const children = the[keyChildren] as
+            | Record<string, unknown>[]
+            | undefined,
+          url = URL.createObjectURL(new Blob()),
+          id = url.split("/").pop(),
           index = the[keyIndex] as number,
           siblings = the[keySiblings] as Record<string, unknown>[];
         URL.revokeObjectURL(url);
