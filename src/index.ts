@@ -80,12 +80,12 @@ export default (
     add: (pId: string) => {
       const the = objLeaves[pId];
       if (the) {
-        const children = the[keyChildren] as
-            | Record<string, unknown>[]
-            | undefined,
+        const url = URL.createObjectURL(new Blob()),
+          [id] = url.toString().split("/").reverse(),
+          children = the[keyChildren] as Record<string, unknown>[] | undefined,
           index = the[keyIndex] as number,
           siblings = the[keySiblings] as Record<string, unknown>[];
-        const id = Math.random().toString(36).slice(2);
+        URL.revokeObjectURL(url);
         switch (true) {
           case !!the[keyParent]:
             siblings.splice(index + 1, 0, { [keyId]: id });
