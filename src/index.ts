@@ -84,7 +84,7 @@ export default (
             | Record<string, unknown>[]
             | undefined,
           url = URL.createObjectURL(new Blob()),
-          id = url.split("/").pop(),
+          id = url.split("/").pop() ?? crypto.randomUUID(),
           index = the[keyIndex] as number,
           siblings = the[keySiblings] as Record<string, unknown>[];
         URL.revokeObjectURL(url);
