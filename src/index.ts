@@ -81,7 +81,7 @@ export default (
       const the = objLeaves[pId];
       if (the) {
         const url = URL.createObjectURL(new Blob()),
-          [id] = url.toString().split("/").reverse(),
+          [id] = url.split("/").reverse(),
           children = the[keyChildren] as Record<string, unknown>[] | undefined,
           index = the[keyIndex] as number,
           siblings = the[keySiblings] as Record<string, unknown>[];
