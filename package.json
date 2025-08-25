@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^13.7.0",
-    "vue": "^3.5.19"
+    "vue": "^3.5.20"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
