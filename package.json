@@ -1,6 +1,6 @@
 {
   "name": "@vuebro/flat-json-tree",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
