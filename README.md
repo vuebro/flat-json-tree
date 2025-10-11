@@ -60,8 +60,10 @@ The composable returns an object with the following properties:
   nodes: ComputedRef<Record<string, unknown>[]>;
   // Reactive object with unique IDs as keys
   nodesMap: ComputedRef<{[id: string]: Record<string, unknown>;}>;
-  // Service function to add an empty object to the tree
+  // Service function to add an empty object to the siblings
   add: (pId: string) => string | undefined;
+  // Service function to add an empty object to the children
+  addChild: (pId: string) => string | undefined;
   // Service function to remove an object from the tree
   remove: (pId: string) => string | undefined;
   // Service function to move an object down by one position
