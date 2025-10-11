@@ -9,12 +9,11 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@vueuse/core": "^13.9.0",
     "vue": "^3.5.22"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
-    "@types/node": "^24.7.1",
+    "@types/node": "^24.7.2",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
