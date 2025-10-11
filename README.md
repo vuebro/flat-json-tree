@@ -9,7 +9,7 @@ To preserve the tree structure and enable manipulations, the following computed 
 ```ts
 {
   // Array of objects representing the path from root to current node
-  branch: Record < string, unknown > [];
+  branch: (Record < string, unknown > []);
   // Index of the object in the sibling array
   index: number;
   // Next object in the sibling array
@@ -19,7 +19,7 @@ To preserve the tree structure and enable manipulations, the following computed 
   // Previous object in the sibling array
   prev: Record<string, unknown> | undefined;
   // Array of sibling objects
-  siblings: Record < string, unknown > [];
+  siblings: (Record < string, unknown > []);
 }
 ```
 
@@ -57,11 +57,9 @@ The composable returns an object with the following properties:
 ```ts
 {
   // Computed flat array of objects (access via .value)
-  leaves: ComputedRef<Record<string, unknown>[]>;
-  // Reactive array of objects
-  arrLeaves: Record<string, unknown>[];
+  nodes: ComputedRef<Record<string, unknown>[]>;
   // Reactive object with unique IDs as keys
-  objLeaves: {[id: string]: Record<string, unknown>;};
+  nodesMap: ComputedRef<{[id: string]: Record<string, unknown>;}>;
   // Service function to add an empty object to the tree
   add: (pId: string) => string | undefined;
   // Service function to remove an object from the tree
@@ -129,14 +127,14 @@ const tree = [
   },
 ];
 
-const { leaves, arrLeaves, objLeaves, add, down, left, remove, right, up } =
+const { nodes, nodesMap, add, down, left, remove, right, up } =
   useFlatJsonTree(tree);
 ```
 
 Check the resulting flat array (using `JSON.stringify` to omit computed properties):
 
 ```js
-console.log(JSON.stringify(leaves.value));
+console.log(JSON.stringify(nodes.value));
 ```
 
 The result is a flat array containing all objects. Keep in mind that each object has computed properties added: `branch`, `index`, `next`, `parent`, `prev`, and `siblings`
@@ -196,7 +194,7 @@ The result is a flat array containing all objects. Keep in mind that each object
 Now let's try to find the object named "1.2.6":
 
 ```js
-console.log(JSON.stringify(arrLeaves.find(({ name }) => name === "1.2.6")));
+console.log(JSON.stringify(nodes.value.find(({ name }) => name === "1.2.6")));
 ```
 
 Output:
@@ -205,10 +203,10 @@ Output:
 { "id": 6, "name": "1.2.6" }
 ```
 
-If the ID is known, you can use `objLeaves`:
+If the ID is known, you can use `nodesMap`:
 
 ```js
-console.log(JSON.stringify(objLeaves[6]));
+console.log(JSON.stringify(nodesMap.value[6]));
 ```
 
 Output:
@@ -221,7 +219,7 @@ Now let's try using the computed properties. Suppose we need to find the parent 
 
 ```js
 console.log(
-  JSON.stringify(arrLeaves.find(({ name }) => name === "1.2.6").parent),
+  JSON.stringify(nodes.value.find(({ name }) => name === "1.2.6").parent),
 );
 ```
 
@@ -242,7 +240,7 @@ Now let's add the object `{ id: 10, name: "1.2.10" }` to the tree after the obje
 
 ```js
 // Find the object named "1.2.6"
-const curObject = arrLeaves.find(({ name }) => name === "1.2.6");
+const curObject = nodes.value.find(({ name }) => name === "1.2.6");
 // Add the object { id: 10, name: "1.2.10" }
 curObject.siblings.splice(curObject.index + 1, 0, { id: 10, name: "1.2.10" });
 // Output the tree object passed to the useFlatJsonTree composable
@@ -285,7 +283,7 @@ Finally, let's test the service function. Move the object named "1.2.6" to the p
 
 ```js
 // Find the object named "1.2.6"
-const curObject = arrLeaves.find(({ name }) => name === "1.2.6");
+const curObject = nodes.value.find(({ name }) => name === "1.2.6");
 // Use the service function up to move it
 up(curObject.id);
 // Output the tree object passed to the useFlatJsonTree composable
