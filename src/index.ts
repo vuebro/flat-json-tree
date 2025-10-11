@@ -1,8 +1,17 @@
-import { toReactive } from "@vueuse/core";
 import { computed, isReactive, reactive } from "vue";
 
+/* -------------------------------------------------------------------------- */
+/*                          Тип произвольного объекта                         */
+/* -------------------------------------------------------------------------- */
+
+export type unObject = Record<string, unknown>;
+
+/* -------------------------------------------------------------------------- */
+/*                 Композабл для работы с древовидным объектом                */
+/* -------------------------------------------------------------------------- */
+
 export default (
-  tree: Record<string, unknown>[],
+  tree: unObject[],
   {
     branch: keyBranch = "branch",
     children: keyChildren = "children",
@@ -14,186 +23,165 @@ export default (
     siblings: keySiblings = "siblings",
   } = {},
 ) => {
+  /* -------------------------------------------------------------------------- */
+  /*            Расчетные свойства для работы с древовидным объектом            */
+  /* -------------------------------------------------------------------------- */
+
   const properties: PropertyDescriptorMap = {
     [keyBranch]: {
-      get(this: Record<string, unknown>) {
+      get(this: unObject) {
         const ret = [this];
-        while (ret[0]?.[keyParent])
-          ret.unshift(ret[0][keyParent] as Record<string, unknown>);
+        while (ret[0]?.[keyParent]) ret.unshift(ret[0][keyParent] as unObject);
         return ret;
       },
     },
     [keyIndex]: {
-      get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[]).findIndex(
+      get(this: unObject) {
+        return (this[keySiblings] as unObject[]).findIndex(
           (sibling) => this[keyId] === sibling[keyId],
         );
       },
     },
     [keyNext]: {
-      get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[])[
+      get(this: unObject) {
+        return (this[keySiblings] as unObject[])[
           (this[keyIndex] as number) + 1
         ];
       },
     },
     [keyPrev]: {
-      get(this: Record<string, unknown>) {
-        return (this[keySiblings] as Record<string, unknown>[])[
+      get(this: unObject) {
+        return (this[keySiblings] as unObject[])[
           (this[keyIndex] as number) - 1
         ];
       },
     },
   };
-  const getLeaves = (
-      siblings: { configurable?: boolean; value: Record<string, unknown>[] },
-      parent = {},
-    ) =>
-      siblings.value.flatMap((value): Record<string, unknown>[] => {
-        Object.defineProperties(value, {
-          ...properties,
-          [keyParent]: parent,
-          [keySiblings]: siblings,
-        });
-        return [
-          value,
-          ...getLeaves(
-            {
-              configurable: true,
-              value: (value[keyChildren] ?? []) as Record<string, unknown>[],
-            },
-            { configurable: true, value },
-          ),
-        ];
-      }),
-    leaves = computed(() =>
-      getLeaves({ value: isReactive(tree) ? tree : reactive(tree) }),
-    ),
-    objLeaves = toReactive(
-      computed(() =>
-        Object.fromEntries(
-          leaves.value.map((leaf) => [leaf[keyId] as string, leaf]),
-        ),
+
+  /* -------------------------------------------------------------------------- */
+  /*       Формирование массива элементов дерева простого и ассоциативного      */
+  /* -------------------------------------------------------------------------- */
+
+  const getItems = (nodes: unObject[], node?: unObject) =>
+      nodes.toReversed().map((child) => ({
+        node: child,
+        parent: { configurable: true, value: node },
+        siblings: { configurable: true, value: nodes },
+      })),
+    getNodes = function* (nodes: unObject[]) {
+      const stack = getItems(nodes);
+      while (stack.length > 0) {
+        const { node, parent, siblings } = stack.pop() ?? {};
+        if (node && parent && siblings) {
+          Object.defineProperties(node, {
+            ...properties,
+            [keyParent]: parent,
+            [keySiblings]: siblings,
+          });
+          yield node;
+          stack.push(
+            ...getItems((node[keyChildren] ?? []) as unObject[], node),
+          );
+        }
+      }
+    },
+    nodes = computed(() => [
+      ...getNodes(isReactive(tree) ? tree : reactive(tree)),
+    ]),
+    nodesMap = computed(() =>
+      Object.fromEntries(
+        nodes.value.map((node) => [node[keyId] as string, node]),
       ),
     );
-  return {
-    add: (pId: string) => {
-      const the = objLeaves[pId];
-      if (the) {
-        const children = the[keyChildren] as
-            | Record<string, unknown>[]
-            | undefined,
-          url = URL.createObjectURL(new Blob()),
-          id = url.split("/").pop() ?? crypto.randomUUID(),
-          index = the[keyIndex] as number,
-          siblings = the[keySiblings] as Record<string, unknown>[];
-        URL.revokeObjectURL(url);
-        switch (true) {
-          case !!the[keyParent]:
-            siblings.splice(index + 1, 0, { [keyId]: id });
-            break;
-          case !!children:
+
+  /* -------------------------------------------------------------------------- */
+  /*       Служебная функция для выполнения действия над элементом дерева       */
+  /* -------------------------------------------------------------------------- */
+
+  const run = (pId: string, action: string) => {
+    const the = nodesMap.value[pId];
+    if (the) {
+      const [root] = nodes.value,
+        children = the[keyChildren] as undefined | unObject[],
+        index = the[keyIndex] as number,
+        next = the[keyNext] as undefined | unObject,
+        nextIndex = index + 1,
+        parent = the[keyParent] as undefined | unObject,
+        prev = the[keyPrev] as undefined | unObject,
+        prevIndex = index - 1,
+        siblings = the[keySiblings] as unObject[];
+      switch (action) {
+        case "add": {
+          const url = URL.createObjectURL(new Blob()),
+            id = url.split("/").pop();
+          URL.revokeObjectURL(url);
+          if (parent && Array.isArray(children))
             children.unshift({ [keyId]: id });
-            break;
-          default:
-            siblings.splice(index + 1, 0, { [keyId]: id });
-            break;
+          else siblings.splice(index + 1, 0, { [keyId]: id });
+          return id;
         }
-        return id;
-      }
-      return undefined;
-    },
-    arrLeaves: toReactive(leaves),
-    down: (pId: string) => {
-      const the = objLeaves[pId];
-      if (the) {
-        const index = the[keyIndex] as number,
-          nextIndex = index + 1,
-          siblings = the[keySiblings] as Record<string, unknown>[];
-        if (
-          index < siblings.length - 1 &&
-          siblings[index] &&
-          siblings[nextIndex]
-        )
-          [siblings[index], siblings[nextIndex]] = [
-            siblings[nextIndex],
-            siblings[index],
-          ];
-      }
-    },
-    leaves,
-    left: (pId: string) => {
-      const the = objLeaves[pId];
-      if (the) {
-        const parent = the[keyParent] as Record<string, unknown> | undefined;
-        if (parent?.[keyParent]) {
-          const children = (parent[keyChildren] ?? []) as Record<
-              string,
-              unknown
-            >[],
-            siblings = parent[keySiblings] as Record<string, unknown>[];
-          siblings.splice(
-            (parent[keyIndex] as number) + 1,
-            0,
-            ...children.splice(the[keyIndex] as number, 1),
-          );
-          return parent[keyId] as string;
-        }
-      }
-      return undefined;
-    },
-    objLeaves,
-    remove: (pId: string) => {
-      const the = objLeaves[pId];
-      if (the) {
-        const parent = the[keyParent] as Record<string, unknown> | undefined;
-        if (parent) {
-          const [root] = leaves.value,
-            next = the[keyNext] as Record<string, unknown> | undefined,
-            prev = the[keyPrev] as Record<string, unknown> | undefined,
-            id = (next?.[keyId] ??
+        case "down":
+          if (
+            index < siblings.length - 1 &&
+            siblings[index] &&
+            siblings[nextIndex]
+          )
+            [siblings[index], siblings[nextIndex]] = [
+              siblings[nextIndex],
+              siblings[index],
+            ];
+          break;
+        case "left":
+          if (parent?.[keyParent]) {
+            (parent[keySiblings] as unObject[]).splice(
+              (parent[keyIndex] as number) + 1,
+              0,
+              ...siblings.splice(index, 1),
+            );
+            return parent[keyId] as string;
+          }
+          break;
+        case "remove":
+          if (parent) {
+            const id = (next?.[keyId] ??
               prev?.[keyId] ??
               parent[keyId] ??
-              root?.[keyId]) as string,
-            siblings = the[keySiblings] as Record<string, unknown>[];
-          siblings.splice(the[keyIndex] as number, 1);
-          return id;
-        }
+              root?.[keyId]) as string | undefined;
+            siblings.splice(index, 1);
+            return id;
+          }
+          break;
+        case "right":
+          if (prev) {
+            const children = (prev[keyChildren] ?? []) as unObject[],
+              id = prev[keyId] as string;
+            prev[keyChildren] = [...children, ...siblings.splice(index, 1)];
+            return id;
+          }
+          break;
+        case "up":
+          if (index && siblings[index] && siblings[prevIndex])
+            [siblings[prevIndex], siblings[index]] = [
+              siblings[index],
+              siblings[prevIndex],
+            ];
+          break;
       }
-      return undefined;
-    },
-    right: (pId: string) => {
-      const the = objLeaves[pId];
-      if (the) {
-        const prev = the[keyPrev] as Record<string, unknown> | undefined;
-        if (prev) {
-          const children = (prev[keyChildren] ?? []) as Record<
-              string,
-              unknown
-            >[],
-            id = prev[keyId] as string,
-            siblings = the[keySiblings] as Record<string, unknown>[];
-          prev[keyChildren] = [
-            ...children,
-            ...siblings.splice(the[keyIndex] as number, 1),
-          ];
-          return id;
-        }
-      }
-      return undefined;
-    },
-    up: (pId: string) => {
-      const the = objLeaves[pId];
-      if (the) {
-        const index = the[keyIndex] as number,
-          prevIndex = index - 1,
-          siblings = the[keySiblings] as Record<string, unknown>[];
-        if (index && siblings[index] && siblings[prevIndex])
-          [siblings[prevIndex], siblings[index]] = [
-            siblings[index],
-            siblings[prevIndex],
-          ];
-      }
-    },
+    }
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /*            Формирование возвращаемого объекта композабл функции            */
+  /* -------------------------------------------------------------------------- */
+
+  return {
+    add: (pId: string) => run(pId, "add"),
+    down: (pId: string) => run(pId, "down"),
+    left: (pId: string) => run(pId, "left"),
+    nodes,
+    nodesMap,
+    remove: (pId: string) => run(pId, "remove"),
+    right: (pId: string) => run(pId, "right"),
+    up: (pId: string) => run(pId, "up"),
   };
 };
