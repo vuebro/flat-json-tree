@@ -7,6 +7,29 @@ import { computed, isReactive, reactive } from "vue";
 export type unObject = Record<string, unknown>;
 
 /* -------------------------------------------------------------------------- */
+/*                            Значения по-умолчанию                           */
+/* -------------------------------------------------------------------------- */
+
+const configurable = true;
+
+/* -------------------------------------------------------------------------- */
+/*                              Служебные функции                             */
+/* -------------------------------------------------------------------------- */
+
+const getItems = (nodes: unObject[], node?: unObject) =>
+    nodes.toReversed().map((child) => ({
+      node: child,
+      parent: { configurable, value: node },
+      siblings: { configurable, value: nodes },
+    })),
+  uid = () => {
+    const url = URL.createObjectURL(new Blob()),
+      uid = url.split("/").pop() ?? crypto.randomUUID();
+    URL.revokeObjectURL(url);
+    return uid;
+  };
+
+/* -------------------------------------------------------------------------- */
 /*                 Композабл для работы с древовидным объектом                */
 /* -------------------------------------------------------------------------- */
 
@@ -62,15 +85,9 @@ export default (
   /*       Формирование массива элементов дерева простого и ассоциативного      */
   /* -------------------------------------------------------------------------- */
 
-  const getItems = (nodes: unObject[], node?: unObject) =>
-      nodes.toReversed().map((child) => ({
-        node: child,
-        parent: { configurable: true, value: node },
-        siblings: { configurable: true, value: nodes },
-      })),
-    getNodes = function* (nodes: unObject[]) {
+  const getNodes = function* (nodes: unObject[]) {
       const stack = getItems(nodes);
-      while (stack.length > 0) {
+      while (stack.length) {
         const { node, parent, siblings } = stack.pop() ?? {};
         if (node && parent && siblings) {
           Object.defineProperties(node, {
@@ -102,7 +119,6 @@ export default (
     const the = nodesMap.value[pId];
     if (the) {
       const [root] = nodes.value,
-        children = the[keyChildren] as undefined | unObject[],
         index = the[keyIndex] as number,
         next = the[keyNext] as undefined | unObject,
         nextIndex = index + 1,
@@ -112,12 +128,14 @@ export default (
         siblings = the[keySiblings] as unObject[];
       switch (action) {
         case "add": {
-          const url = URL.createObjectURL(new Blob()),
-            id = url.split("/").pop();
-          URL.revokeObjectURL(url);
-          if (parent && Array.isArray(children))
-            children.unshift({ [keyId]: id });
-          else siblings.splice(index + 1, 0, { [keyId]: id });
+          const id = uid();
+          siblings.splice(nextIndex, 0, { [keyId]: id });
+          return id;
+        }
+        case "addChild": {
+          const id = uid();
+          if (!Array.isArray(the[keyChildren])) the[keyChildren] = [];
+          (the[keyChildren] as unObject[]).unshift({ [keyId]: id });
           return id;
         }
         case "down":
@@ -141,16 +159,14 @@ export default (
             return parent[keyId] as string;
           }
           break;
-        case "remove":
-          if (parent) {
-            const id = (next?.[keyId] ??
-              prev?.[keyId] ??
-              parent[keyId] ??
-              root?.[keyId]) as string | undefined;
-            siblings.splice(index, 1);
-            return id;
-          }
-          break;
+        case "remove": {
+          const id = (next?.[keyId] ??
+            prev?.[keyId] ??
+            parent?.[keyId] ??
+            root?.[keyId]) as string | undefined;
+          siblings.splice(index, 1);
+          return id;
+        }
         case "right":
           if (prev) {
             const children = (prev[keyChildren] ?? []) as unObject[],
@@ -176,6 +192,7 @@ export default (
 
   return {
     add: (pId: string) => run(pId, "add"),
+    addChild: (pId: string) => run(pId, "addChild"),
     down: (pId: string) => run(pId, "down"),
     left: (pId: string) => run(pId, "left"),
     nodes,
