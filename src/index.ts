@@ -16,12 +16,8 @@ const configurable = true;
 /*                              Служебные функции                             */
 /* -------------------------------------------------------------------------- */
 
-const getItems = (nodes: unObject[], node?: unObject) =>
-    [...nodes].reverse().map((child) => ({
-      node: child,
-      parent: { configurable, value: node },
-      siblings: { configurable, value: nodes },
-    })),
+const getItems = (siblings: unObject[], parent?: unObject) =>
+    [...siblings].reverse().map((node) => ({ node, parent, siblings })),
   uid = () => {
     const url = URL.createObjectURL(new Blob()),
       uid = url.split("/").pop() ?? crypto.randomUUID();
@@ -89,13 +85,13 @@ export default (
       const stack = getItems(nodes);
       while (stack.length) {
         const { node, parent, siblings } = stack.pop() ?? {};
-        if (node && parent && siblings) {
+        if (node) {
           if (node[keyParent] !== parent)
             Object.defineProperty(node, keyParent, {
               configurable,
               value: parent,
             });
-          if (node[keySiblings] !== parent)
+          if (node[keySiblings] !== siblings)
             Object.defineProperty(node, keySiblings, {
               configurable,
               value: siblings,
