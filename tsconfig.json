@@ -12,7 +12,6 @@
   "compilerOptions": {
     "emitDeclarationOnly": false,
     "allowImportingTsExtensions": false,
-    "outDir": "dist",
-    "paths": { "@/*": ["./src/*"] }
+    "outDir": "dist"
   }
 }
