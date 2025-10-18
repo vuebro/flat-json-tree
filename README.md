@@ -93,7 +93,7 @@ Assume we have a tree structure with elements like:
 { id: number, name: string, children: [] }
 ```
 
-> [!WARNING]
+> [!WARNING] <!-- eslint-disable-line -- This should be fixed in https://github.com/eslint/markdown/issues/294 -->
 >
 > Elements can contain arbitrary fields, but must have a unique identifier
 
@@ -323,9 +323,9 @@ As a result, the objects named "1.2.5" and "1.2.6" have swapped positions:
 ]
 ```
 
-> [!NOTE]
+> [!NOTE] <!-- eslint-disable-line -- This should be fixed in https://github.com/eslint/markdown/issues/294 -->
 >
-> <img src="https://vuebro.ru/images/drakkar.svg" width="250"/>
+> <img src="https://vuebro.ru/images/drakkar.svg" alt="drakkar" width="250"/>
 >
 > Made on the shores of the Baltic Sea
 
