@@ -91,9 +91,15 @@ export default (
         const { node, parent, siblings } = stack.pop() ?? {};
         if (node && parent && siblings) {
           if (node[keyParent] !== parent)
-            Object.defineProperty(node, keyParent, { value: parent });
+            Object.defineProperty(node, keyParent, {
+              configurable,
+              value: parent,
+            });
           if (node[keySiblings] !== parent)
-            Object.defineProperty(node, keySiblings, { value: siblings });
+            Object.defineProperty(node, keySiblings, {
+              configurable,
+              value: siblings,
+            });
           if (Object.keys(properties).some((key) => !(key in node)))
             Object.defineProperties(node, properties);
           yield node;
