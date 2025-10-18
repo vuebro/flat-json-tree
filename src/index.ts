@@ -17,7 +17,7 @@ const configurable = true;
 /* -------------------------------------------------------------------------- */
 
 const getItems = (nodes: unObject[], node?: unObject) =>
-    nodes.toReversed().map((child) => ({
+    [...nodes].reverse().map((child) => ({
       node: child,
       parent: { configurable, value: node },
       siblings: { configurable, value: nodes },
@@ -90,11 +90,12 @@ export default (
       while (stack.length) {
         const { node, parent, siblings } = stack.pop() ?? {};
         if (node && parent && siblings) {
-          Object.defineProperties(node, {
-            ...properties,
-            [keyParent]: parent,
-            [keySiblings]: siblings,
-          });
+          if (node[keyParent] !== parent)
+            Object.defineProperty(node, keyParent, { value: parent });
+          if (node[keySiblings] !== parent)
+            Object.defineProperty(node, keySiblings, { value: siblings });
+          if (Object.keys(properties).some((key) => !(key in node)))
+            Object.defineProperties(node, properties);
           yield node;
           stack.push(
             ...getItems((node[keyChildren] ?? []) as unObject[], node),
