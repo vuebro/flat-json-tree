@@ -38,8 +38,8 @@
     "vue": "^3.5.22"
   },
   "devDependencies": {
-    "@types/node": "^24.8.1",
-    "@vuebro/configs": "^1.1.7",
+    "@types/node": "^24.9.1",
+    "@vuebro/configs": "^1.1.11",
     "eslint": "^9.38.0"
   }
 }
