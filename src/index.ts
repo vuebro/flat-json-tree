@@ -16,11 +16,6 @@ const configurable = true;
 /*                              Служебные функции                             */
 /* -------------------------------------------------------------------------- */
 
-/**
- *
- * @param siblings
- * @param parent
- */
 const getItems = (siblings: unObject[], parent?: unObject) =>
     [...siblings].reverse().map((node) => ({ node, parent, siblings })),
   uid = () => {
@@ -34,19 +29,6 @@ const getItems = (siblings: unObject[], parent?: unObject) =>
 /*                 Композабл для работы с древовидным объектом                */
 /* -------------------------------------------------------------------------- */
 
-/**
- *
- * @param tree
- * @param root0
- * @param root0.branch
- * @param root0.children
- * @param root0.id
- * @param root0.index
- * @param root0.next
- * @param root0.parent
- * @param root0.prev
- * @param root0.siblings
- */
 export default (
   tree: unObject[],
   {
@@ -66,9 +48,6 @@ export default (
 
   const properties: PropertyDescriptorMap = {
     [keyBranch]: {
-      /**
-       *
-       */
       get(this: unObject) {
         const ret = [this];
         while (ret[0]?.[keyParent]) ret.unshift(ret[0][keyParent] as unObject);
@@ -76,9 +55,6 @@ export default (
       },
     },
     [keyIndex]: {
-      /**
-       *
-       */
       get(this: unObject) {
         return (this[keySiblings] as unObject[]).findIndex(
           (sibling) => this[keyId] === sibling[keyId],
@@ -86,9 +62,6 @@ export default (
       },
     },
     [keyNext]: {
-      /**
-       *
-       */
       get(this: unObject) {
         return (this[keySiblings] as unObject[])[
           (this[keyIndex] as number) + 1
@@ -96,9 +69,6 @@ export default (
       },
     },
     [keyPrev]: {
-      /**
-       *
-       */
       get(this: unObject) {
         return (this[keySiblings] as unObject[])[
           (this[keyIndex] as number) - 1
@@ -111,10 +81,6 @@ export default (
   /*       Формирование массива элементов дерева простого и ассоциативного      */
   /* -------------------------------------------------------------------------- */
 
-  /**
-   *
-   * @param nodes
-   */
   const getNodes = function* (nodes: unObject[]) {
       const stack = getItems(nodes);
       while (stack.length) {
@@ -152,11 +118,6 @@ export default (
   /*       Служебная функция для выполнения действия над элементом дерева       */
   /* -------------------------------------------------------------------------- */
 
-  /**
-   *
-   * @param pId
-   * @param action
-   */
   const run = (pId: string, action: string) => {
     const the = nodesMap.value[pId];
     if (the) {
@@ -234,42 +195,14 @@ export default (
   /* -------------------------------------------------------------------------- */
 
   return {
-    /**
-     *
-     * @param pId
-     */
     add: (pId: string) => run(pId, "add"),
-    /**
-     *
-     * @param pId
-     */
     addChild: (pId: string) => run(pId, "addChild"),
-    /**
-     *
-     * @param pId
-     */
     down: (pId: string) => run(pId, "down"),
-    /**
-     *
-     * @param pId
-     */
     left: (pId: string) => run(pId, "left"),
     nodes,
     nodesMap,
-    /**
-     *
-     * @param pId
-     */
     remove: (pId: string) => run(pId, "remove"),
-    /**
-     *
-     * @param pId
-     */
     right: (pId: string) => run(pId, "right"),
-    /**
-     *
-     * @param pId
-     */
     up: (pId: string) => run(pId, "up"),
   };
 };
