@@ -1,6 +1,6 @@
 {
   "name": "@vuebro/flat-json-tree",
-  "version": "2.1.8",
+  "version": "2.1.9",
   "description": "A dead simple way to manipulate JSON tree objects",
   "keywords": [
     "flat",
