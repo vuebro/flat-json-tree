@@ -1,3 +1,4 @@
-node_modules/
-dist/
 .DS_Store
+.qwen
+node_modules
+dist
