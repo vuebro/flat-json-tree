@@ -46,33 +46,62 @@ export default (
   /*            Расчетные свойства для работы с древовидным объектом            */
   /* -------------------------------------------------------------------------- */
 
-  const properties: PropertyDescriptorMap = {
+  const properties = {
     [keyBranch]: {
-      get(this: unObject) {
+      /**
+       * A computed property that returns an array containing the current object
+       * and all its parent objects by traversing up the parent chain using the
+       * keyParent property.
+       *
+       * @returns {unObject[]} An array of objects starting from the topmost
+       *   parent to the current object.
+       */
+      get(this: unObject): unObject[] {
         const ret = [this];
         while (ret[0]?.[keyParent]) ret.unshift(ret[0][keyParent] as unObject);
         return ret;
       },
     },
-    [keyIndex]: {
-      get(this: unObject) {
-        return (this[keySiblings] as unObject[]).findIndex(
-          (sibling) => this[keyId] === sibling[keyId],
-        );
+    [keyPrev]: {
+      /**
+       * A computed property that returns the previous sibling of the current
+       * object.
+       *
+       * @returns {unObject | undefined} The previous sibling object or
+       *   undefined if there is no previous sibling.
+       */
+      get(this: unObject): undefined | unObject {
+        return (this[keySiblings] as unObject[])[
+          (this[keyIndex] as number) - 1
+        ];
       },
     },
     [keyNext]: {
-      get(this: unObject) {
+      /**
+       * A computed property that returns the next sibling of the current
+       * object.
+       *
+       * @returns {unObject | undefined} The next sibling object or undefined if
+       *   there is no next sibling.
+       */
+      get(this: unObject): undefined | unObject {
         return (this[keySiblings] as unObject[])[
           (this[keyIndex] as number) + 1
         ];
       },
     },
-    [keyPrev]: {
-      get(this: unObject) {
-        return (this[keySiblings] as unObject[])[
-          (this[keyIndex] as number) - 1
-        ];
+    [keyIndex]: {
+      /**
+       * A computed property that finds the index of the current object in its
+       * siblings array.
+       *
+       * @returns {number} The index of the current object in its siblings
+       *   array.
+       */
+      get(this: unObject): number {
+        return (this[keySiblings] as unObject[]).findIndex(
+          (sibling) => this[keyId] === sibling[keyId],
+        );
       },
     },
   };
@@ -81,6 +110,14 @@ export default (
   /*       Формирование массива элементов дерева простого и ассоциативного      */
   /* -------------------------------------------------------------------------- */
 
+  /**
+   * A generator function that traverses a tree-like structure of nodes and
+   * yields each node after setting up its relationships and properties
+   *
+   * @param {unObject[]} nodes - Array of nodes to be processed
+   * @yields {unObject} Each node in the tree, with its relationships and
+   *   properties
+   */
   const getNodes = function* (nodes: unObject[]) {
       const stack = getItems(nodes);
       while (stack.length) {
