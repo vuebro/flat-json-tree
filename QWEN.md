@@ -11,6 +11,7 @@ The project follows the AGPL-3.0 license and is maintained by Jerry Bruwes.
 ## Architecture and Implementation
 
 The library transforms a JSON tree into a flat array while preserving the tree structure through computed properties added to each child object:
+
 - `branch`: Array of objects representing the path from root to current node
 - `index`: Index of the object in the sibling array
 - `next`: Next object in the sibling array
@@ -23,22 +24,29 @@ The main implementation is in `src/index.ts` as a default export function that t
 ## Building and Running
 
 ### Prerequisites
+
 - Node.js and npm
 
 ### Build Process
+
 To build the project:
+
 ```bash
 npm run build
 ```
+
 This command uses TypeScript compiler (tsc) to compile the source code.
 
 ### Linting
+
 To lint the code:
+
 ```bash
 npm run lint
 ```
 
 ### Development Setup
+
 1. Clone the repository
 2. Run `npm install` to install dependencies
 3. Run `npm run build` to build the project
@@ -46,12 +54,15 @@ npm run lint
 ## Key Features and API
 
 ### Main Function
+
 `useFlatJsonTree(tree, options?)` - The main composable function with the following return value:
+
 - `nodes`: ComputedRef with the flat array of objects
 - `nodesMap`: ComputedRef with an object mapping unique IDs to objects
 - Manipulation functions: `add`, `addChild`, `remove`, `down`, `left`, `right`, `up`
 
 ### Manipulation Functions
+
 - `add`: Add an empty object to the siblings
 - `addChild`: Add an empty object to the children
 - `remove`: Remove an object from the tree
@@ -63,16 +74,19 @@ npm run lint
 ## Development Conventions
 
 ### Coding Style
+
 - The project uses TypeScript with Vue 3 reactivity
 - Follows ESLint linting rules defined in `@vuebro/configs/eslint`
 - TypeScript configuration extends `@vuebro/configs/tsconfig`
 - Uses Prettier formatting with `@vuebro/configs/prettierrc` configuration
 
 ### File Structure
+
 - `src/index.ts`: Main implementation file
 - `dist/`: Compiled output directory
 - Configuration files at root level (eslint.config.ts, tsconfig.json, etc.)
 
 ### Dependencies
+
 - Vue 3 (reactivity system) as main dependency
 - Development dependencies include TypeScript, Node types, and VueBro configuration packages
