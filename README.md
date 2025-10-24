@@ -1,8 +1,10 @@
-# A dead simple way to manipulate JSON tree objects
+# flat-json-tree
 
-The core idea is to transform a JSON tree object into a flat array, allowing standard operations like find, findIndex, filter, map, and others.
+A dead simple way to manipulate JSON tree objects by transforming them into flat arrays for standard operations.
 
-A mandatory requirement for the algorithm is that each element in the JSON tree must have a field with a unique identifier.
+## Overview
+
+The core idea is to transform a JSON tree object into a flat array, allowing standard operations like find, findIndex, filter, map, and others. A mandatory requirement for the algorithm is that each element in the JSON tree must have a field with a unique identifier.
 
 To preserve the tree structure and enable manipulations, the following computed properties are added to each child object:
 
@@ -23,67 +25,45 @@ To preserve the tree structure and enable manipulations, the following computed 
 }
 ```
 
-The transformation is performed using the `useFlatJsonTree` composable:
-
-```ts
-function useFlatJsonTree(
-  // The JSON tree object
-  tree: Record<string, unknown>[],
-  //  Optional object to define alternative names for id, children, and computed properties
-  {
-    branch,
-    children,
-    id,
-    index,
-    next,
-    parent,
-    prev,
-    siblings,
-  }?: {
-    branch?: string | undefined;
-    children?: string | undefined;
-    id?: string | undefined;
-    index?: string | undefined;
-    next?: string | undefined;
-    parent?: string | undefined;
-    prev?: string | undefined;
-    siblings?: string | undefined;
-  },
-);
-```
-
-The composable returns an object with the following properties:
-
-```ts
-{
-  // Computed flat array of objects (access via .value)
-  nodes: ComputedRef<Record<string, unknown>[]>;
-  // Reactive object with unique IDs as keys
-  nodesMap: ComputedRef<{[id: string]: Record<string, unknown>;}>;
-  // Service function to add an empty object to the siblings
-  add: (pId: string) => string | undefined;
-  // Service function to add an empty object to the children
-  addChild: (pId: string) => string | undefined;
-  // Service function to remove an object from the tree
-  remove: (pId: string) => string | undefined;
-  // Service function to move an object down by one position
-  down: (pId: string) => void;
-  // Service function to move an object left by one position
-  left: (pId: string) => string | undefined;
-  // Service function to move an object right by one position
-  right: (pId: string) => string | undefined;
-  // Service function to move an object up by one position
-  up: (pId: string) => void;
-}
-```
-
 ## Installation
 
 ```bash
-
 npm i @vuebro/flat-json-tree
-
 ```
+
+## API
+
+### `useFlatJsonTree(tree, options?)`
+
+The main composable function that transforms a JSON tree into a flat array with tree navigation properties.
+
+#### Parameters:
+
+- `tree` (Required): `Record<string, unknown>[]` - The JSON tree object
+- `options` (Optional): Configuration object to define alternative names for id, children, and computed properties
+  - `branch`: Property name for the branch path (default: "branch")
+  - `children`: Property name for child nodes (default: "children")
+  - `id`: Property name for unique identifiers (default: "id")
+  - `index`: Property name for index in siblings (default: "index")
+  - `next`: Property name for next sibling (default: "next")
+  - `parent`: Property name for parent object (default: "parent")
+  - `prev`: Property name for previous sibling (default: "prev")
+  - `siblings`: Property name for siblings array (default: "siblings")
+
+#### Returns:
+
+An object with the following properties:
+
+- `nodes`: `ComputedRef<Record<string, unknown>[]>` - Computed flat array of objects
+- `nodesMap`: `ComputedRef<{[id: string]: Record<string, unknown>}>` - Reactive object with unique IDs as keys
+- Manipulation methods:
+  - `add(pId: string)`: Add an empty object to the siblings
+  - `addChild(pId: string)`: Add an empty object to the children
+  - `remove(pId: string)`: Remove an object from the tree
+  - `down(pId: string)`: Move an object down by one position
+  - `left(pId: string)`: Move an object left by one position
+  - `right(pId: string)`: Move an object right by one position
+  - `up(pId: string)`: Move an object up by one position
 
 ## Usage
 
@@ -93,9 +73,7 @@ Assume we have a tree structure with elements like:
 { id: number, name: string, children: [] }
 ```
 
-> [!WARNING] <!-- eslint-disable-line -- This should be fixed in https://github.com/eslint/markdown/issues/294 -->
->
-> Elements can contain arbitrary fields, but must have a unique identifier
+Elements can contain arbitrary fields, but must have a unique identifier.
 
 ### Example using `useFlatJsonTree` composable
 
@@ -323,10 +301,8 @@ As a result, the objects named "1.2.5" and "1.2.6" have swapped positions:
 ]
 ```
 
-> [!NOTE] <!-- eslint-disable-line -- This should be fixed in https://github.com/eslint/markdown/issues/294 -->
->
-> <img src="https://vuebro.ru/images/drakkar.svg" alt="drakkar" width="250"/>
->
-> Made on the shores of the Baltic Sea
+## License
 
-License: [AGPL](https://choosealicense.com/licenses/agpl-3.0)
+This project is licensed under the AGPL-3.0-only license.
+
+Made on the shores of the Baltic Sea 🚢

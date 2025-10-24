@@ -4,9 +4,7 @@
 
 `flat-json-tree` is a TypeScript library that provides a simple way to manipulate JSON tree objects. The core idea is to transform a JSON tree object into a flat array, allowing standard array operations like `find`, `findIndex`, `filter`, `map`, and others. It's built as a Vue 3 composable function.
 
-The library is published as `@vuebro/flat-json-tree` with the current version being 2.1.12. It's designed to work with tree structures where each element has a unique identifier field.
-
-The project follows the AGPL-3.0 license and is maintained by Jerry Bruwes.
+The library is published as `@vuebro/flat-json-tree` with the current version being 2.1.14. It's designed to work with tree structures where each element has a unique identifier field.
 
 ## Architecture and Implementation
 
