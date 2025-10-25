@@ -1,4 +1,5 @@
 import { isReactive, computed, reactive } from "vue";
+import uid from "uuid-random";
 
 /* -------------------------------------------------------------------------- */
 /*                         Тип универсального объекта                         */
@@ -16,14 +17,8 @@ const configurable = true;
 /*                              Служебные функции                             */
 /* -------------------------------------------------------------------------- */
 
-const uid = () => {
-    const url = URL.createObjectURL(new Blob()),
-      uid = url.split("/").pop() ?? crypto.randomUUID();
-    URL.revokeObjectURL(url);
-    return uid;
-  },
-  getItems = (siblings: unObject[], parent?: unObject) =>
-    [...siblings].reverse().map((node) => ({ siblings, parent, node }));
+const getItems = (siblings: unObject[], parent?: unObject) =>
+  [...siblings].reverse().map((node) => ({ siblings, parent, node }));
 
 /* -------------------------------------------------------------------------- */
 /*                 Композабл для работы с древовидным объектом                */
