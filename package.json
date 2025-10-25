@@ -37,6 +37,6 @@
   "prettier": "@vuebro/configs/prettierrc",
   "devDependencies": {
     "@types/node": "^24.9.1",
-    "@vuebro/configs": "^1.1.40"
+    "@vuebro/configs": "^1.1.41"
   }
 }
