@@ -1,5 +1,5 @@
-import { isReactive, computed, reactive } from "vue";
 import uid from "uuid-random";
+import { computed, isReactive, reactive } from "vue";
 
 /* -------------------------------------------------------------------------- */
 /*                         Тип универсального объекта                         */
@@ -18,7 +18,7 @@ const configurable = true;
 /* -------------------------------------------------------------------------- */
 
 const getItems = (siblings: unObject[], parent?: unObject) =>
-  [...siblings].reverse().map((node) => ({ siblings, parent, node }));
+  [...siblings].reverse().map((node) => ({ node, parent, siblings }));
 
 /* -------------------------------------------------------------------------- */
 /*                 Композабл для работы с древовидным объектом                */
@@ -27,14 +27,14 @@ const getItems = (siblings: unObject[], parent?: unObject) =>
 export default (
   tree: unObject[],
   {
-    children: keyChildren = "children",
-    siblings: keySiblings = "siblings",
     branch: keyBranch = "branch",
-    parent: keyParent = "parent",
+    children: keyChildren = "children",
+    id: keyId = "id",
     index: keyIndex = "index",
     next: keyNext = "next",
+    parent: keyParent = "parent",
     prev: keyPrev = "prev",
-    id: keyId = "id",
+    siblings: keySiblings = "siblings",
   } = {},
 ) => {
   /* -------------------------------------------------------------------------- */
@@ -57,18 +57,18 @@ export default (
         return ret;
       },
     },
-    [keyPrev]: {
+    [keyIndex]: {
       /**
-       * A computed property that returns the previous sibling of the current
-       * object.
+       * A computed property that finds the index of the current object in its
+       * siblings array.
        *
-       * @returns {unObject | undefined} The previous sibling object or
-       *   undefined if there is no previous sibling.
+       * @returns {number} The index of the current object in its siblings
+       *   array.
        */
-      get(this: unObject): undefined | unObject {
-        return (this[keySiblings] as unObject[])[
-          (this[keyIndex] as number) - 1
-        ];
+      get(this: unObject): number {
+        return (this[keySiblings] as unObject[]).findIndex(
+          (sibling) => this[keyId] === sibling[keyId],
+        );
       },
     },
     [keyNext]: {
@@ -85,18 +85,18 @@ export default (
         ];
       },
     },
-    [keyIndex]: {
+    [keyPrev]: {
       /**
-       * A computed property that finds the index of the current object in its
-       * siblings array.
+       * A computed property that returns the previous sibling of the current
+       * object.
        *
-       * @returns {number} The index of the current object in its siblings
-       *   array.
+       * @returns {unObject | undefined} The previous sibling object or
+       *   undefined if there is no previous sibling.
        */
-      get(this: unObject): number {
-        return (this[keySiblings] as unObject[]).findIndex(
-          (sibling) => this[keyId] === sibling[keyId],
-        );
+      get(this: unObject): undefined | unObject {
+        return (this[keySiblings] as unObject[])[
+          (this[keyIndex] as number) - 1
+        ];
       },
     },
   };
@@ -116,17 +116,17 @@ export default (
   const getNodes = function* (nodes: unObject[]) {
     const stack = getItems(nodes);
     while (stack.length) {
-      const { siblings, parent, node } = stack.pop() ?? {};
+      const { node, parent, siblings } = stack.pop() ?? {};
       if (node) {
         if (node[keyParent] !== parent)
           Object.defineProperty(node, keyParent, {
-            value: parent,
             configurable,
+            value: parent,
           });
         if (node[keySiblings] !== siblings)
           Object.defineProperty(node, keySiblings, {
-            value: siblings,
             configurable,
+            value: siblings,
           });
         if (Object.keys(properties).some((key) => !(key in node)))
           Object.defineProperties(node, properties);
@@ -151,37 +151,26 @@ export default (
   const run = (pId: string, action: string) => {
     const the = nodesMap.value[pId];
     if (the) {
-      const parent = the[keyParent] as undefined | unObject,
-        next = the[keyNext] as undefined | unObject,
-        prev = the[keyPrev] as undefined | unObject,
-        siblings = the[keySiblings] as unObject[],
+      const [root] = nodes.value,
         index = the[keyIndex] as number,
+        next = the[keyNext] as undefined | unObject,
         nextIndex = index + 1,
+        parent = the[keyParent] as undefined | unObject,
+        prev = the[keyPrev] as undefined | unObject,
         prevIndex = index - 1,
-        [root] = nodes.value;
+        siblings = the[keySiblings] as unObject[];
       switch (action) {
+        case "add": {
+          const id = uid();
+          siblings.splice(nextIndex, 0, { [keyId]: id });
+          return id;
+        }
         case "addChild": {
           const id = uid();
           if (!Array.isArray(the[keyChildren])) the[keyChildren] = [];
           (the[keyChildren] as unObject[]).unshift({ [keyId]: id });
           return id;
         }
-        case "remove": {
-          const id = (next?.[keyId] ??
-            prev?.[keyId] ??
-            parent?.[keyId] ??
-            root?.[keyId]) as undefined | string;
-          siblings.splice(index, 1);
-          return id;
-        }
-        case "right":
-          if (prev) {
-            const children = (prev[keyChildren] ?? []) as unObject[],
-              id = prev[keyId] as string;
-            prev[keyChildren] = [...children, ...siblings.splice(index, 1)];
-            return id;
-          }
-          break;
         case "down":
           if (
             index < siblings.length - 1 &&
@@ -203,11 +192,22 @@ export default (
             return parent[keyId] as string;
           }
           break;
-        case "add": {
-          const id = uid();
-          siblings.splice(nextIndex, 0, { [keyId]: id });
+        case "remove": {
+          const id = (next?.[keyId] ??
+            prev?.[keyId] ??
+            parent?.[keyId] ??
+            root?.[keyId]) as string | undefined;
+          siblings.splice(index, 1);
           return id;
         }
+        case "right":
+          if (prev) {
+            const children = (prev[keyChildren] ?? []) as unObject[],
+              id = prev[keyId] as string;
+            prev[keyChildren] = [...children, ...siblings.splice(index, 1)];
+            return id;
+          }
+          break;
         case "up":
           if (index && siblings[index] && siblings[prevIndex])
             [siblings[prevIndex], siblings[index]] = [
@@ -225,14 +225,14 @@ export default (
   /* -------------------------------------------------------------------------- */
 
   return {
+    add: (pId: string) => run(pId, "add"),
     addChild: (pId: string) => run(pId, "addChild"),
-    remove: (pId: string) => run(pId, "remove"),
-    right: (pId: string) => run(pId, "right"),
     down: (pId: string) => run(pId, "down"),
     left: (pId: string) => run(pId, "left"),
-    add: (pId: string) => run(pId, "add"),
-    up: (pId: string) => run(pId, "up"),
-    nodesMap,
     nodes,
+    nodesMap,
+    remove: (pId: string) => run(pId, "remove"),
+    right: (pId: string) => run(pId, "right"),
+    up: (pId: string) => run(pId, "up"),
   };
 };
