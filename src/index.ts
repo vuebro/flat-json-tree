@@ -114,37 +114,35 @@ export default (
    *   properties
    */
   const getNodes = function* (nodes: unObject[]) {
-      const stack = getItems(nodes);
-      while (stack.length) {
-        const { siblings, parent, node } = stack.pop() ?? {};
-        if (node) {
-          if (node[keyParent] !== parent)
-            Object.defineProperty(node, keyParent, {
-              value: parent,
-              configurable,
-            });
-          if (node[keySiblings] !== siblings)
-            Object.defineProperty(node, keySiblings, {
-              value: siblings,
-              configurable,
-            });
-          if (Object.keys(properties).some((key) => !(key in node)))
-            Object.defineProperties(node, properties);
-          yield node;
-          stack.push(
-            ...getItems((node[keyChildren] ?? []) as unObject[], node),
-          );
-        }
+    const stack = getItems(nodes);
+    while (stack.length) {
+      const { siblings, parent, node } = stack.pop() ?? {};
+      if (node) {
+        if (node[keyParent] !== parent)
+          Object.defineProperty(node, keyParent, {
+            value: parent,
+            configurable,
+          });
+        if (node[keySiblings] !== siblings)
+          Object.defineProperty(node, keySiblings, {
+            value: siblings,
+            configurable,
+          });
+        if (Object.keys(properties).some((key) => !(key in node)))
+          Object.defineProperties(node, properties);
+        yield node;
+        stack.push(...getItems((node[keyChildren] ?? []) as unObject[], node));
       }
-    },
-    nodesMap = computed(() =>
-      Object.fromEntries(
-        nodes.value.map((node) => [node[keyId] as string, node]),
-      ),
+    }
+  };
+  const nodes = computed(() => [
+    ...getNodes(isReactive(tree) ? tree : reactive(tree)),
+  ]);
+  const nodesMap = computed(() =>
+    Object.fromEntries(
+      nodes.value.map((node) => [node[keyId] as string, node]),
     ),
-    nodes = computed(() => [
-      ...getNodes(isReactive(tree) ? tree : reactive(tree)),
-    ]);
+  );
 
   /* -------------------------------------------------------------------------- */
   /*       Служебная функция для выполнения действия над элементом дерева       */
