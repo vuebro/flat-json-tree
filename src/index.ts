@@ -3,15 +3,15 @@ import { computed, isReactive, reactive } from "vue";
 
 export type unObject = Record<string, unknown>;
 
-/**
- * Creates an array of node objects with parent and siblings
- *
- * @param {unObject[]} siblings - Array of sibling nodes
- * @param {unObject} [parent] - Parent node
- * @returns {{ node: unObject; parent: unObject; siblings: unObject }[]} Array
- *   of objects containing node, parent, and siblings
- */
 const configurable = true,
+  /**
+   * Creates an array of node objects with parent and siblings
+   *
+   * @param {unObject[]} siblings - Array of sibling nodes
+   * @param {unObject} [parent] - Parent node
+   * @returns {{ node: unObject; parent: unObject; siblings: unObject }[]}
+   *   Array of objects containing node, parent, and siblings
+   */
   getItems = (siblings: unObject[], parent?: unObject) =>
     [...siblings].reverse().map((node) => ({ node, parent, siblings }));
 
