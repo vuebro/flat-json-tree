@@ -3,10 +3,40 @@ import { computed, isReactive, reactive } from "vue";
 
 export type unObject = Record<string, unknown>;
 
+/**
+ * Creates an array of node objects with parent and siblings
+ *
+ * @param {unObject[]} siblings - Array of sibling nodes
+ * @param {unObject} [parent] - Parent node
+ * @returns {{ node: unObject; parent: unObject; siblings: unObject }[]} Array
+ *   of objects containing node, parent, and siblings
+ */
 const configurable = true,
   getItems = (siblings: unObject[], parent?: unObject) =>
     [...siblings].reverse().map((node) => ({ node, parent, siblings }));
 
+/**
+ * Creates a flat representation of a JSON tree with helper functions to
+ * manipulate the tree
+ *
+ * @param {unObject[]} tree - The tree structure to flatten
+ * @param {object} [root0] - Configuration object for key names
+ * @param {string} [root0.branch] - Key name for branch property (default:
+ *   "branch")
+ * @param {string} [root0.children] - Key name for children property (default:
+ *   "children")
+ * @param {string} [root0.id] - Key name for id property (default: "id")
+ * @param {string} [root0.index] - Key name for index property (default:
+ *   "index")
+ * @param {string} [root0.next] - Key name for next property (default: "next")
+ * @param {string} [root0.parent] - Key name for parent property (default:
+ *   "parent")
+ * @param {string} [root0.prev] - Key name for prev property (default: "prev")
+ * @param {string} [root0.siblings] - Key name for siblings property (default:
+ *   "siblings")
+ * @returns {object} Object containing nodes, nodesMap and manipulation
+ *   functions
+ */
 export default (
   tree: unObject[],
   {
@@ -22,6 +52,11 @@ export default (
 ) => {
   const properties = {
     [keyBranch]: {
+      /**
+       * Gets the branch (path from root) for the current node
+       *
+       * @returns {unObject[]} Array of nodes from root to current node
+       */
       get(this: unObject): unObject[] {
         const ret = [this];
         while (ret[0]?.[keyParent]) ret.unshift(ret[0][keyParent] as unObject);
@@ -29,6 +64,11 @@ export default (
       },
     },
     [keyIndex]: {
+      /**
+       * Gets the index of the current node in its siblings array
+       *
+       * @returns {number} Index of the node in its siblings array
+       */
       get(this: unObject): number {
         return (this[keySiblings] as unObject[]).findIndex(
           (sibling) => this[keyId] === sibling[keyId],
@@ -36,6 +76,11 @@ export default (
       },
     },
     [keyNext]: {
+      /**
+       * Gets the next sibling node
+       *
+       * @returns {undefined | unObject} Next sibling node or undefined if none
+       */
       get(this: unObject): undefined | unObject {
         return (this[keySiblings] as unObject[])[
           (this[keyIndex] as number) + 1
@@ -43,6 +88,12 @@ export default (
       },
     },
     [keyPrev]: {
+      /**
+       * Gets the previous sibling node
+       *
+       * @returns {undefined | unObject} Previous sibling node or undefined if
+       *   none
+       */
       get(this: unObject): undefined | unObject {
         return (this[keySiblings] as unObject[])[
           (this[keyIndex] as number) - 1
@@ -50,6 +101,13 @@ export default (
       },
     },
   };
+  /**
+   * Generator function that traverses the tree and yields each node
+   *
+   * @param {unObject[]} nodes - Array of nodes to traverse
+   * @yields {unObject} Each node in the tree
+   * @returns {Generator<unObject>} Generator that yields nodes
+   */
   const getNodes = function* (nodes: unObject[]) {
       const stack = getItems(nodes);
       while (stack.length) {
@@ -82,6 +140,14 @@ export default (
         nodes.value.map((node) => [node[keyId] as string, node]),
       ),
     ),
+    /**
+     * Function to run actions on nodes
+     *
+     * @param {string} pId - ID of the node to perform action on
+     * @param {string} action - Action to perform (add, addChild, remove, up,
+     *   down, left, right)
+     * @returns {string | undefined} ID of the affected node or undefined
+     */
     run = (pId: string, action: string) => {
       const the = nodesMap.value[pId];
       if (the) {
@@ -155,14 +221,58 @@ export default (
     };
 
   return {
+    /**
+     * Adds a new sibling node after the specified node
+     *
+     * @param {string} pId - ID of the node to add a sibling to
+     * @returns {string | undefined} ID of the newly added node
+     */
     add: (pId: string) => run(pId, "add"),
+    /**
+     * Adds a new child node to the specified node
+     *
+     * @param {string} pId - ID of the node to add a child to
+     * @returns {string | undefined} ID of the newly added child node
+     */
     addChild: (pId: string) => run(pId, "addChild"),
+    /**
+     * Moves the specified node one position down within its siblings
+     *
+     * @param {string} pId - ID of the node to move down
+     * @returns {void}
+     */
     down: (pId: string) => run(pId, "down"),
+    /**
+     * Moves the specified node one level up in the hierarchy, making it a
+     * sibling of its parent
+     *
+     * @param {string} pId - ID of the node to move left
+     * @returns {string | undefined} ID of the parent node if successful
+     */
     left: (pId: string) => run(pId, "left"),
     nodes,
     nodesMap,
+    /**
+     * Removes the specified node from the tree
+     *
+     * @param {string} pId - ID of the node to remove
+     * @returns {string | undefined} ID of the next node that gets focus after
+     *   removal
+     */
     remove: (pId: string) => run(pId, "remove"),
+    /**
+     * Moves the specified node as a child of the previous sibling
+     *
+     * @param {string} pId - ID of the node to move right
+     * @returns {string | undefined} ID of the new parent node if successful
+     */
     right: (pId: string) => run(pId, "right"),
+    /**
+     * Moves the specified node one position up within its siblings
+     *
+     * @param {string} pId - ID of the node to move up
+     * @returns {void}
+     */
     up: (pId: string) => run(pId, "up"),
   };
 };
