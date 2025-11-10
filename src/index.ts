@@ -1,5 +1,8 @@
+import type { MaybeRef } from "vue";
+
+import { toReactive } from "@vueuse/core";
 import uid from "uuid-random";
-import { computed, isReactive, reactive } from "vue";
+import { computed } from "vue";
 
 export type unObject = Record<string, unknown>;
 
@@ -33,7 +36,7 @@ const configurable = true,
  * @returns Object containing nodes, kvNodes and manipulation functions
  */
 export default (
-  tree: unObject[],
+  tree: MaybeRef<unObject[]>,
   {
     branch: keyBranch = "branch",
     children: keyChildren = "children",
@@ -127,9 +130,7 @@ export default (
         }
       }
     },
-    nodes = computed(() => [
-      ...getNodes(isReactive(tree) ? tree : reactive(tree)),
-    ]);
+    nodes = computed(() => [...getNodes(toReactive(tree))]);
 
   const kvNodes = computed(() =>
       Object.fromEntries(
