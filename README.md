@@ -55,7 +55,7 @@ The main composable function that transforms a JSON tree into a flat array with 
 An object with the following properties:
 
 - `nodes`: `ComputedRef<Record<string, unknown>[]>` - Computed flat array of objects
-- `nodesMap`: `ComputedRef<{[id: string]: Record<string, unknown>}>` - Reactive object with unique IDs as keys
+- `kvNodes`: `ComputedRef<{[id: string]: Record<string, unknown>}>` - Reactive object with unique IDs as keys
 - Manipulation methods:
   - `add(pId: string)`: Add an empty object to the siblings
   - `addChild(pId: string)`: Add an empty object to the children
@@ -107,7 +107,7 @@ const tree = [
   },
 ];
 
-const { nodes, nodesMap, add, down, left, remove, right, up } =
+const { nodes, kvNodes, add, down, left, remove, right, up } =
   useFlatJsonTree(tree);
 ```
 
@@ -183,10 +183,10 @@ Output:
 { "id": 6, "name": "1.2.6" }
 ```
 
-If the ID is known, you can use `nodesMap`:
+If the ID is known, you can use `kvNodes`:
 
 ```js
-console.log(JSON.stringify(nodesMap.value[6]));
+console.log(JSON.stringify(kvNodes.value[6]));
 ```
 
 Output:

@@ -30,7 +30,7 @@ const configurable = true,
  * @param [root0.prev] - Key name for prev property (default: "prev")
  * @param [root0.siblings] - Key name for siblings property (default:
  *   "siblings")
- * @returns Object containing nodes, nodesMap and manipulation functions
+ * @returns Object containing nodes, kvNodes and manipulation functions
  */
 export default (
   tree: unObject[],
@@ -95,6 +95,7 @@ export default (
       },
     },
   };
+
   /**
    * Generator function that traverses the tree and yields each node
    *
@@ -128,8 +129,9 @@ export default (
     },
     nodes = computed(() => [
       ...getNodes(isReactive(tree) ? tree : reactive(tree)),
-    ]),
-    nodesMap = computed(() =>
+    ]);
+
+  const kvNodes = computed(() =>
       Object.fromEntries(
         nodes.value.map((node) => [node[keyId] as string, node]),
       ),
@@ -143,7 +145,7 @@ export default (
      * @returns ID of the affected node or undefined
      */
     run = (pId: string, action: string) => {
-      const the = nodesMap.value[pId];
+      const the = kvNodes.value[pId];
       if (the) {
         const [root] = nodes.value,
           index = the[keyIndex] as number,
@@ -236,6 +238,7 @@ export default (
      * @returns Undefined
      */
     down: (pId: string) => run(pId, "down"),
+    kvNodes,
     /**
      * Moves the specified node one level up in the hierarchy, making it a
      * sibling of its parent
@@ -245,7 +248,6 @@ export default (
      */
     left: (pId: string) => run(pId, "left"),
     nodes,
-    nodesMap,
     /**
      * Removes the specified node from the tree
      *
