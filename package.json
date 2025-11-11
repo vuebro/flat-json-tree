@@ -1,6 +1,6 @@
 {
   "name": "@vuebro/flat-json-tree",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A Vue 3 composable that transforms JSON tree objects into flat arrays for easy manipulation with standard array operations while maintaining tree structure through computed properties",
   "keywords": [
     "vue",
