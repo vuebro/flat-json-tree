@@ -1,8 +1,7 @@
-import type { MaybeRef } from "vue";
+import type { MaybeRef, Ref } from "vue";
 
-import { toReactive } from "@vueuse/core";
 import uid from "uuid-random";
-import { computed } from "vue";
+import { computed, toRef } from "vue";
 
 export type unObject = Record<string, unknown>;
 
@@ -106,8 +105,8 @@ export default (
    * @yields {unObject} Each node in the tree
    * @returns Generator that yields nodes
    */
-  const getNodes = function* (nodes: unObject[]) {
-      const stack = getItems(nodes);
+  const getNodes = function* (nodes: Ref<unObject[]>) {
+      const stack = getItems(nodes.value);
       while (stack.length) {
         const { node, parent, siblings } = stack.pop() ?? {};
         if (node) {
@@ -130,7 +129,7 @@ export default (
         }
       }
     },
-    nodes = computed(() => [...getNodes(toReactive(tree))]);
+    nodes = computed(() => [...getNodes(toRef(tree))]);
 
   const kvNodes = computed(() =>
       Object.fromEntries(
