@@ -1,4 +1,5 @@
 {
+  "$schema": "https://www.schemastore.org/package",
   "name": "@vuebro/flat-json-tree",
   "version": "2.2.3",
   "description": "A Vue 3 composable that transforms JSON tree objects into flat arrays for easy manipulation with standard array operations while maintaining tree structure through computed properties",
@@ -44,7 +45,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@vuebro/configs": "^1.2.0",
+    "@vuebro/configs": "^1.2.1",
     "eslint": "^9.39.1"
   }
 }
